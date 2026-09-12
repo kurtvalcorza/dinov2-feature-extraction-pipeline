@@ -20,7 +20,11 @@ base_model: timm/vit_small_patch14_dinov2.lvd142m
 
 ## Interactive Colab Tutorials
 
-This release ships no tutorial notebook (`tutorials/` is absent). The package is exercised through its test suite (`tests/`) and the run instructions in the README; a `NOTEBOOK_SPEC` 1.0 `TASK-INFERENCE` notebook is a follow-up, not a claim this card makes.
+This pipeline provides a ready-to-run interactive Google Colab notebook that exercises the repository's public API end to end — bootstrap a fresh runtime, stage and verify the pinned upstream revision, validate an input, run the task, and inspect and export the outputs:
+
+- **Task Inference Tutorial**:  
+  [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/kurtvalcorza/dinov2-feature-extraction-pipeline/blob/main/tutorials/dinov2_feature_extraction_colab.ipynb) [`dinov2_feature_extraction_colab.ipynb`](https://github.com/kurtvalcorza/dinov2-feature-extraction-pipeline/blob/main/tutorials/dinov2_feature_extraction_colab.ipynb)  
+  *DINOv2 ViT-S/14 image feature extraction: one L2-normalised 384-d class-token vector per image on a synthetic sample set with a qualitative pairwise cosine check; embeddings are representations, not predictions, and no metric is reported.*
 
 ---
 
