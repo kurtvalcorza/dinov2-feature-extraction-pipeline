@@ -1,14 +1,64 @@
-# dinov2-feature-extraction-pipeline
+# DINOv2 Feature Extraction Pipeline
 
-DIMER pipeline scaffold for **timm/vit_small_patch14_dinov2.lvd142m** — Image Feature Extraction.
+DIMER inference wrapper for **`timm/vit_small_patch14_dinov2.lvd142m`** — self-supervised image feature extraction (384-d embeddings, no classifier head) — pinned to an immutable Hugging Face revision and loaded only from a digest-verified local snapshot.
 
-| | |
-|---|---|
-| Upstream model | [`timm/vit_small_patch14_dinov2.lvd142m`](https://huggingface.co/timm/vit_small_patch14_dinov2.lvd142m) |
-| Pinned revision | `4610ca143709d58a633b6397a74412c2c3842454` (resolved 2026-09-12) |
-| Upstream license | `apache-2.0` (verified on the Hub 2026-09-12; re-check at the pinned revision before release) |
-| Weight files to stage | `model.safetensors` |
-| Status | scaffold only — no weights downloaded, no pipeline code yet |
+## Upstream alignment
 
-Weights are staged under `weights/` and are git-ignored. This repository follows the
-MODEL_CARD_SPEC 1.0 / NOTEBOOK_SPEC 1.0 conventions used by the other `*-pipeline` repos.
+- Model: `timm/vit_small_patch14_dinov2.lvd142m` (DINOv2 ViT-S/14, 22.1 M parameters, LVD-142M pre-training)
+- Revision: `4610ca143709d58a633b6397a74412c2c3842454`
+- Upstream weight license: Apache-2.0 (upstream re-licensed from CC-BY-NC-4.0 on 2023-08-31; the `cc-by-nc-4.0` in the snapshot `config.json` is a stale timm field — see `docs/WEIGHTS.md`)
+- Upstream task: image feature backbone, fixed 518×518 input, `num_classes = 0`, class-token pooling
+- Repository adaptation: **none**; inference only. This package adds L2 normalisation of the pooled vector.
+
+## Quick start
+
+```python
+from PIL import Image
+from dinov2_feature_extraction_pipeline import DINOv2FeatureExtractionPipeline
+
+pipe = DINOv2FeatureExtractionPipeline.from_pretrained()          # cuda:0 if available, else cpu
+result = pipe.embed([Image.open("a.jpg"), Image.open("b.jpg")])
+a, b = result["embeddings"]                                       # two lists of 384 floats, unit L2 norm
+print(result["dim"], result["pooling"], sum(x * y for x, y in zip(a, b)))   # 384 cls <cosine similarity>
+```
+
+There is no label, no score and no metric helper: an embedding has no intrinsic accuracy. Evaluate on your own downstream task (retrieval, clustering, a linear probe) and calibrate any similarity threshold on your own labelled pairs.
+
+## Weights layout
+
+```
+weights/vit-small-dinov2/
+  dimer-base-manifest.json   # modelId, revision, per-file bytes + sha256 (verified on every load)
+  config.json                # timm pretrained_cfg: input size 518, mean/std, num_classes 0, global_pool token
+  model.safetensors          # 88240510 bytes, git-ignored
+```
+
+`from_pretrained()` calls `verify_snapshot()` first and refuses to load if any file is missing or its SHA-256 differs from the manifest. Without a snapshot, `allow_download=True` loads from the Hub through timm's `hf-hub:timm/vit_small_patch14_dinov2.lvd142m@4610ca143709d58a633b6397a74412c2c3842454` form; the default is to refuse. To stage the snapshot: `hf download timm/vit_small_patch14_dinov2.lvd142m --revision 4610ca143709d58a633b6397a74412c2c3842454 --local-dir weights/vit-small-dinov2`, then write the manifest.
+
+## Tests and smoke
+
+```
+pip install -e . --no-deps
+pytest -q -o addopts= tests      # offline, no weights needed
+```
+
+Smoke (loads the verified snapshot and embeds one synthetic image):
+
+```python
+from PIL import Image
+from dinov2_feature_extraction_pipeline import DINOv2FeatureExtractionPipeline
+
+pipe = DINOv2FeatureExtractionPipeline.from_pretrained()
+vec = pipe.embed(Image.new("RGB", (256, 256), (90, 140, 200)))["embeddings"][0]
+print(len(vec), sum(v * v for v in vec))   # 384 1.0
+```
+
+## Documents
+
+- [`MODEL_CARD.md`](MODEL_CARD.md) — MODEL_CARD_SPEC 1.0 card
+- [`docs/WEIGHTS.md`](docs/WEIGHTS.md) — weight provenance and hosting
+- [`STATUS.md`](STATUS.md) — release status
+
+## Licensing
+
+Repository code is Apache-2.0 (see `LICENSE`). The upstream weights are recorded as Apache-2.0; see `docs/WEIGHTS.md` for the open discrepancy.
