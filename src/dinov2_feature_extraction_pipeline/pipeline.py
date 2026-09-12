@@ -111,11 +111,6 @@ def _hub_reference(model_id: str, revision: str) -> str:
     return f"hf-hub:{model_id}@{revision}"
 
 
-def _hub_reference(model_id: str, revision: str) -> str:
-    """timm's ``hf-hub:owner/name@revision`` form; ``hf_split`` passes ``revision=`` to hf_hub_download."""
-    return f"hf-hub:{model_id}@{revision}"
-
-
 @dataclass
 class DINOv2FeatureExtractionPipeline:
     """``_runner`` maps a float tensor (N, 3, H, W) to pooled features (N, EMBED_DIM); injectable."""

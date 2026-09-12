@@ -53,6 +53,16 @@ vec = pipe.embed(Image.new("RGB", (256, 256), (90, 140, 200)))["embeddings"][0]
 print(len(vec), sum(v * v for v in vec))   # 384 1.0
 ```
 
+## Tutorial
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/kurtvalcorza/dinov2-feature-extraction-pipeline/blob/main/tutorials/dinov2_feature_extraction_colab.ipynb)
+
+`tutorials/dinov2_feature_extraction_colab.ipynb` is declared `TASK-INFERENCE` with the embedding obligations of NOTEBOOK_SPEC section 20.6 (see `tutorials/README.md`). Its default path generates three synthetic 256x256 images in code (a gradient, its 180-degree rotation, a flat block), surfaces `MAX_IMAGE_SIDE`/`MAX_BATCH` and the `EMBED_DIM`/`POOLING`/`NORMALIZED` contract, stages the missing snapshot file with `stage_missing_files(..., allow_download=True)` and digest-verifies it with `verify_snapshot`, embeds the batch through the public API, prints a qualitative pairwise cosine check, and exports every vector with its identifier plus provenance JSON. No metric is reported: embeddings are representations, not predictions, and must be evaluated on a downstream labelled task. BYOD is optional and gated off by default.
+
+## Release status
+
+**Candidate.** Static/unit checks do not constitute clean-runtime notebook evidence. Complete `docs/release-verification.md` against the exact release revision before calling the notebook release-grade.
+
 ## Documents
 
 - [`MODEL_CARD.md`](MODEL_CARD.md) — MODEL_CARD_SPEC 1.0 card
@@ -61,4 +71,4 @@ print(len(vec), sum(v * v for v in vec))   # 384 1.0
 
 ## Licensing
 
-Repository code is Apache-2.0 (see `LICENSE`). The upstream weights are recorded as Apache-2.0; see `docs/WEIGHTS.md` for the open discrepancy.
+Repository code is Apache-2.0 (see `LICENSE`). The upstream weights are Apache-2.0; `docs/WEIGHTS.md` records how the stale `cc-by-nc-4.0` field in the snapshot `config.json` was resolved against the upstream re-licensing of 2023-08-31.
