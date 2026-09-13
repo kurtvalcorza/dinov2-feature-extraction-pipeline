@@ -3,6 +3,8 @@ license: apache-2.0
 model_card_spec: "1.1"
 pipeline_tag: image-feature-extraction
 base_model: timm/vit_small_patch14_dinov2.lvd142m
+date_published: "2023-05-09"
+date_published_source: "Hugging Face Hub repository creation date of the exact hosted checkpoint (`createdAt`, https://huggingface.co/api/models/timm/vit_small_patch14_dinov2.lvd142m)"
 ---
 
 # DINOv2 ViT-S/14 lvd142m (DIMER package v0.1.0) — Visual Feature Extraction
@@ -11,7 +13,6 @@ base_model: timm/vit_small_patch14_dinov2.lvd142m
 [![Upstream GitHub](https://img.shields.io/badge/Upstream%20GitHub-facebookresearch%2Fdinov2-181717?style=flat&logo=github&logoColor=white)](https://github.com/facebookresearch/dinov2)
 [![arXiv Paper](https://img.shields.io/badge/arXiv-2304.07193-b31b1b.svg)](https://arxiv.org/abs/2304.07193)
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Pipeline](https://img.shields.io/badge/Pipeline-dinov2--feature--extraction--pipeline-2ea44f?style=flat&logo=github)](https://github.com/kurtvalcorza/dinov2-feature-extraction-pipeline)
 
 > [!WARNING]
 > ⚠️ **Provided for research, training, and evaluation purposes only.** Model weights are redistributed unmodified under their upstream license, which controls your use, including any commercial use or redistribution; the accompanying code and notebooks are released under this repository's license. All of it is supplied **"as is"**, without warranty of any kind, and has not been validated for production, clinical, or safety-critical use. Running the notebooks downloads third-party weights and datasets governed by their own licenses and consumes compute on your own Colab/Kaggle account. To the maximum extent permitted by law, the maintainers of this repository and the DIMER platform accept no liability for any damages arising from their use. Hosting implies no affiliation with or endorsement by the original authors.
@@ -28,7 +29,7 @@ This pipeline provides a ready-to-run interactive Google Colab notebook that exe
 
 ---
 
-###### Description
+#### Description
 
 `timm/vit_small_patch14_dinov2.lvd142m` is the small (ViT-S/14) DINOv2 vision transformer, pre-trained by Meta AI on the curated LVD-142M image collection with the self-supervised DINOv2 objective — no labels — and published in `timm` as a feature backbone (upstream README; Oquab et al., arXiv:2304.07193), pinned here to revision `4610ca143709d58a633b6397a74412c2c3842454`. At the fixed 518×518 input the image becomes 37×37 = 1369 patches of 14 px plus a class token, 1370 tokens of width 384 (upstream README `forward_features` example), processed by 12 transformer blocks; upstream reports 22.1 M parameters and 46.8 GMACs. The snapshot has `num_classes = 0` and `global_pool = "token"`, so a forward pass returns the class token after the final LayerNorm — a 384-d vector, no logits and no label. This repository fixes that as `POOLING = "cls"`, L2-normalises the vector (`NORMALIZED = True`) so a dot product between two outputs is a cosine similarity, and adds packaging: the `DINOv2FeatureExtractionPipeline` class in `src/dinov2_feature_extraction_pipeline/pipeline.py`, digest verification of the local snapshot (`verify_snapshot`), input validation and a fixed output contract. Nothing is fine-tuned, adapted or conditioned here; there is no metric helper because a representation has no intrinsic accuracy.
 
