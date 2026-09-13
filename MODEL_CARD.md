@@ -1,16 +1,32 @@
 ---
 license: apache-2.0
-model_card_spec: "1.0"
+model_card_spec: "1.1"
 pipeline_tag: image-feature-extraction
 base_model: timm/vit_small_patch14_dinov2.lvd142m
 ---
 
-# DINOv2 ViT-S/14 lvd142m (DIMER package v0.1.0)
+# DINOv2 ViT-S/14 lvd142m (DIMER package v0.1.0) — Visual Feature Extraction
 
 [![Hugging Face](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-timm%2Fvit__small__patch14__dinov2.lvd142m-ffcc4d?style=flat)](https://huggingface.co/timm/vit_small_patch14_dinov2.lvd142m)
-[![GitHub](https://img.shields.io/badge/GitHub-facebookresearch%2Fdinov2-181717?style=flat&logo=github&logoColor=white)](https://github.com/facebookresearch/dinov2)
-[![arXiv](https://img.shields.io/badge/arXiv-2304.07193-b31b1b.svg)](https://arxiv.org/abs/2304.07193)
-[![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
+[![Upstream GitHub](https://img.shields.io/badge/Upstream%20GitHub-facebookresearch%2Fdinov2-181717?style=flat&logo=github&logoColor=white)](https://github.com/facebookresearch/dinov2)
+[![arXiv Paper](https://img.shields.io/badge/arXiv-2304.07193-b31b1b.svg)](https://arxiv.org/abs/2304.07193)
+[![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Pipeline](https://img.shields.io/badge/Pipeline-dinov2--feature--extraction--pipeline-2ea44f?style=flat&logo=github)](https://github.com/kurtvalcorza/dinov2-feature-extraction-pipeline)
+
+> [!WARNING]
+> ⚠️ **Provided for research, training, and evaluation purposes only.** Model weights are redistributed unmodified under their upstream license, which controls your use, including any commercial use or redistribution; the accompanying code and notebooks are released under this repository's license. All of it is supplied **"as is"**, without warranty of any kind, and has not been validated for production, clinical, or safety-critical use. Running the notebooks downloads third-party weights and datasets governed by their own licenses and consumes compute on your own Colab/Kaggle account. To the maximum extent permitted by law, the maintainers of this repository and the DIMER platform accept no liability for any damages arising from their use. Hosting implies no affiliation with or endorsement by the original authors.
+
+---
+
+## Interactive Colab Tutorials
+
+This pipeline provides a ready-to-run interactive Google Colab notebook that exercises the repository's public API end to end — bootstrap a fresh runtime, stage and verify the pinned upstream revision, validate an input, run the task, and inspect and export the outputs:
+
+- **Task Inference Tutorial**:  
+  [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/kurtvalcorza/dinov2-feature-extraction-pipeline/blob/main/tutorials/dinov2_feature_extraction_colab.ipynb) [`dinov2_feature_extraction_colab.ipynb`](https://github.com/kurtvalcorza/dinov2-feature-extraction-pipeline/blob/main/tutorials/dinov2_feature_extraction_colab.ipynb)  
+  *DINOv2 ViT-S/14 image feature extraction: one L2-normalised 384-d class-token vector per image on a synthetic sample set with a qualitative pairwise cosine check; embeddings are representations, not predictions, and no metric is reported.*
+
+---
 
 ###### Description
 
@@ -50,7 +66,7 @@ Operating environment: Python 3.12 with `torch==2.14.0`, `torchvision==0.29.0`, 
 
 ###### Performance Measures
 
-The pipeline reports **no performance measure** and ships no metric helper: its output is a representation, not a prediction, so there is no ground truth to score it against inside this repository. The paper evaluates DINOv2 features through downstream tasks — ImageNet linear probe and k-NN accuracy, retrieval mean average precision, segmentation mIoU — and that is what a caller must do too: choose a downstream task, obtain labels for it, train the probe or set the retrieval threshold, and report that task's metric. Numbers from the paper for ViT-S/14 are not restated here because this pipeline has not reproduced them and the paper's evaluation used its own heads and protocols. What the unit tests do check is structural: 384 floats per image, unit L2 norm, and that different inputs yield different vectors.
+The pipeline reports **no performance measure** and ships no metric helper: its output is a representation, not a prediction, so there is no ground truth to score it against inside this repository. The paper evaluates DINOv2 features through downstream tasks — ImageNet linear probe and k-NN accuracy, retrieval mean average precision, segmentation mIoU — and that is what a caller must do too: choose a downstream task, obtain labels for it, train the probe or set the retrieval threshold, and report that task's metric. Numbers from the paper for ViT-S/14 are not restated here because this pipeline has not reproduced them and the paper's evaluation used its own heads and protocols. What the unit tests do check is structural: 384 floats per image, unit L2 norm, and that different inputs yield different vectors. The public `evaluation_report(result)` helper is the only reporting path and always returns the verdict `not-measurable` for exactly this reason: it names the score semantics (a cosine similarity between two L2-normalised vectors is not an accuracy or a calibrated score, and no threshold is shipped) and the downstream labelled task — retrieval mAP, a linear probe or k-NN accuracy, or human-judged duplicate pairs — that would make the features measurable.
 
 ###### Decision thresholds
 
@@ -72,7 +88,7 @@ The pipeline is not intended for decisions in health, safety, criminal justice, 
 
 ###### Mitigations
 
-Implemented and inspectable in `src/dinov2_feature_extraction_pipeline/pipeline.py`: (1) supply chain — `MODEL_REVISION` is a 40-hex commit; `verify_snapshot` re-hashes every file in `weights/vit-small-dinov2/dimer-base-manifest.json` and raises on the first size or SHA-256 mismatch before any weight is loaded; the Hub path is taken only with `allow_download=True` and then through timm's `hf-hub:<id>@<revision>` form; `trust_remote_code` is never enabled (timm executes no remote code); `from_pretrained` also checks the loaded model's `num_features` equals `EMBED_DIM`. (2) Input integrity — `_validate` rejects non-PIL inputs, empty or over-size batches, and images outside 1–4096 px before the model runs. (3) Reproducibility — exact `==` dependency pins, `model.eval()`, deterministic preprocessing from the snapshot's `pretrained_cfg`, fixed pooling and normalisation, and `model_id`/`model_revision` in every result. (4) Refusals — no dense-feature or training API is exposed; a missing snapshot with `allow_download=False` raises `FileNotFoundError`. No statistical mitigation is applied because the pipeline does not train.
+Implemented and inspectable in `src/dinov2_feature_extraction_pipeline/pipeline.py`: (1) supply chain — `MODEL_REVISION` is a 40-hex commit; `verify_snapshot` re-hashes every file in `weights/vit-small-dinov2/dimer-base-manifest.json` and raises on the first size or SHA-256 mismatch before any weight is loaded; the Hub path is taken only with `allow_download=True` and then through timm's `hf-hub:<id>@<revision>` form; `trust_remote_code` is never enabled (timm executes no remote code); `from_pretrained` also checks the loaded model's `num_features` equals `EMBED_DIM`. (2) Input integrity — `_validate` rejects non-PIL inputs, empty or over-size batches, and images outside 1–4096 px before the model runs, and the public `validate_inputs(images, names=...)` stage routes through the same private check so it raises exactly what `embed` raises while returning a machine-readable input manifest of the schema, ceilings, per-input observations and verdict. (3) Reproducibility — exact `==` dependency pins, `model.eval()`, deterministic preprocessing from the snapshot's `pretrained_cfg`, fixed pooling and normalisation, and `model_id`/`model_revision` in every result. (4) Refusals — no dense-feature or training API is exposed; a missing snapshot with `allow_download=False` raises `FileNotFoundError`. No statistical mitigation is applied because the pipeline does not train.
 
 ###### Risks and harms
 
