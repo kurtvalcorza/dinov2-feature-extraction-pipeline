@@ -1,6 +1,7 @@
 from .pipeline import (
     DEFAULT_WEIGHTS_DIR,
     EMBED_DIM,
+    INPUT_SCHEMA,
     MAX_BATCH,
     MAX_IMAGE_SIDE,
     MODEL_ID,
@@ -10,12 +11,15 @@ from .pipeline import (
     NORMALIZED,
     POOLING,
     DINOv2FeatureExtractionPipeline,
+    evaluation_report,
     stage_missing_files,
+    validate_inputs,
     verify_snapshot,
 )
 
 __all__ = [
     "DEFAULT_WEIGHTS_DIR",
+    "INPUT_SCHEMA",
     "EMBED_DIM",
     "MAX_BATCH",
     "MAX_IMAGE_SIDE",
@@ -26,6 +30,8 @@ __all__ = [
     "NORMALIZED",
     "POOLING",
     "DINOv2FeatureExtractionPipeline",
+    "evaluation_report",
     "stage_missing_files",
+    "validate_inputs",
     "verify_snapshot",
 ]
