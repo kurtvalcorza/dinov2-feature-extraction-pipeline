@@ -220,10 +220,6 @@ class DINOv2FeatureExtractionPipeline:
         weights_dir: str | Path | None = None,
         allow_download: bool = False,
     ) -> DINOv2FeatureExtractionPipeline:
-        import timm
-        import torch
-        from timm.data import create_transform, resolve_model_data_config
-
         root = Path(weights_dir or DEFAULT_WEIGHTS_DIR)
         arch_name = MODEL_ID.split("/", 1)[1]
         if (root / MANIFEST_NAME).is_file():
@@ -236,11 +232,15 @@ class DINOv2FeatureExtractionPipeline:
                 raise ValueError(f"snapshot config names {snapshot_name!r}, expected {arch_name!r}")
             overlay = dict(config["pretrained_cfg"])
             overlay["file"] = str(root / WEIGHTS_FILE)  # 'file' takes precedence over hf_hub_id in timm
+            import timm  # after snapshot verification / download consent
+
             model = timm.create_model(
                 arch_name, pretrained=True, pretrained_cfg_overlay=overlay, num_classes=0
             )
             source = "local-snapshot"
         elif allow_download:
+            import timm  # after snapshot verification / download consent
+
             model = timm.create_model(
                 _hub_reference(MODEL_ID, revision=MODEL_REVISION), pretrained=True, num_classes=0
             )
@@ -250,6 +250,10 @@ class DINOv2FeatureExtractionPipeline:
                 f"no verified snapshot at {root} and allow_download=False; "
                 f"stage it with: hf download {MODEL_ID} --revision {MODEL_REVISION} --local-dir {root}"
             )
+        # Refuse invalid snapshots before importing model libraries.
+        import torch
+        from timm.data import create_transform, resolve_model_data_config
+
         if getattr(model, "num_features", EMBED_DIM) != EMBED_DIM:
             raise ValueError(f"model num_features {model.num_features} != EMBED_DIM={EMBED_DIM}")
         resolved_device = device or ("cuda:0" if torch.cuda.is_available() else "cpu")
