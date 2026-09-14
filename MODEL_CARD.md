@@ -3,6 +3,8 @@ license: apache-2.0
 model_card_spec: "1.1"
 pipeline_tag: image-feature-extraction
 base_model: timm/vit_small_patch14_dinov2.lvd142m
+date_published: "2023-05-09"
+date_published_source: "Hugging Face Hub repository creation date of the exact hosted checkpoint (`createdAt`, https://huggingface.co/api/models/timm/vit_small_patch14_dinov2.lvd142m)"
 ---
 
 # DINOv2 ViT-S/14 lvd142m (DIMER package v0.1.0) — Visual Feature Extraction
@@ -11,7 +13,6 @@ base_model: timm/vit_small_patch14_dinov2.lvd142m
 [![Upstream GitHub](https://img.shields.io/badge/Upstream%20GitHub-facebookresearch%2Fdinov2-181717?style=flat&logo=github&logoColor=white)](https://github.com/facebookresearch/dinov2)
 [![arXiv Paper](https://img.shields.io/badge/arXiv-2304.07193-b31b1b.svg)](https://arxiv.org/abs/2304.07193)
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Pipeline](https://img.shields.io/badge/Pipeline-dinov2--feature--extraction--pipeline-2ea44f?style=flat&logo=github)](https://github.com/kurtvalcorza/dinov2-feature-extraction-pipeline)
 
 > [!WARNING]
 > ⚠️ **Provided for research, training, and evaluation purposes only.** Model weights are redistributed unmodified under their upstream license, which controls your use, including any commercial use or redistribution; the accompanying code and notebooks are released under this repository's license. All of it is supplied **"as is"**, without warranty of any kind, and has not been validated for production, clinical, or safety-critical use. Running the notebooks downloads third-party weights and datasets governed by their own licenses and consumes compute on your own Colab/Kaggle account. To the maximum extent permitted by law, the maintainers of this repository and the DIMER platform accept no liability for any damages arising from their use. Hosting implies no affiliation with or endorsement by the original authors.
@@ -28,7 +29,7 @@ This pipeline provides a ready-to-run interactive Google Colab notebook that exe
 
 ---
 
-###### Description
+#### Description
 
 `timm/vit_small_patch14_dinov2.lvd142m` is the small (ViT-S/14) DINOv2 vision transformer, pre-trained by Meta AI on the curated LVD-142M image collection with the self-supervised DINOv2 objective — no labels — and published in `timm` as a feature backbone (upstream README; Oquab et al., arXiv:2304.07193), pinned here to revision `4610ca143709d58a633b6397a74412c2c3842454`. At the fixed 518×518 input the image becomes 37×37 = 1369 patches of 14 px plus a class token, 1370 tokens of width 384 (upstream README `forward_features` example), processed by 12 transformer blocks; upstream reports 22.1 M parameters and 46.8 GMACs. The snapshot has `num_classes = 0` and `global_pool = "token"`, so a forward pass returns the class token after the final LayerNorm — a 384-d vector, no logits and no label. This repository fixes that as `POOLING = "cls"`, L2-normalises the vector (`NORMALIZED = True`) so a dot product between two outputs is a cosine similarity, and adds packaging: the `DINOv2FeatureExtractionPipeline` class in `src/dinov2_feature_extraction_pipeline/pipeline.py`, digest verification of the local snapshot (`verify_snapshot`), input validation and a fixed output contract. Nothing is fine-tuned, adapted or conditioned here; there is no metric helper because a representation has no intrinsic accuracy.
 
@@ -60,7 +61,7 @@ LVD-142M images are web photographs of varied, undocumented provenance — many 
 
 ###### Environment
 
-Operating environment: Python 3.12 with `torch==2.14.0`, `torchvision==0.29.0`, `timm==1.0.29`, `pillow==11.3.0` (exact pins in `pyproject.toml`). CUDA is optional; `from_pretrained` picks `cuda:0` when available, else CPU, and runs in float32 on both. On this repository's smoke run (claude-science WSL venv, RTX 5070 Ti 16 GB, two synthetic 256×256 images through `DINOv2FeatureExtractionPipeline.from_pretrained().embed`) loading the verified snapshot took 3.36 s and embedding the pair 1.22 s including transform and first-call CUDA warm-up; both vectors had unit norm and their cosine similarity was 0.9667 (a gradient and its 180° rotation). The CPU path is exercised only by the unit tests with an injected runner. Data environment: inputs are assumed to be natural photographs; the paper reports that DINOv2 features transfer to many domains without fine-tuning, but this pipeline measures nothing about that, and synthetic, medical or satellite imagery should be treated as untested.
+Operating environment: Python 3.12 with `torch==2.14.0`, `torchvision==0.29.0`, `torchaudio==2.11.0`, `timm==1.0.29`, `pillow==11.3.0` (exact pins in `pyproject.toml`). CUDA is optional; `from_pretrained` picks `cuda:0` when available, else CPU, and runs in float32 on both. On this repository's smoke run (claude-science WSL venv, RTX 5070 Ti 16 GB, two synthetic 256×256 images through `DINOv2FeatureExtractionPipeline.from_pretrained().embed`) loading the verified snapshot took 3.36 s and embedding the pair 1.22 s including transform and first-call CUDA warm-up; both vectors had unit norm and their cosine similarity was 0.9667 (a gradient and its 180° rotation). The CPU path is exercised only by the unit tests with an injected runner. Data environment: inputs are assumed to be natural photographs; the paper reports that DINOv2 features transfer to many domains without fine-tuning, but this pipeline measures nothing about that, and synthetic, medical or satellite imagery should be treated as untested.
 
 #### Metrics
 
@@ -116,7 +117,7 @@ The pipeline must not be used for surveillance, biometric identification, person
 
 ## Runtime
 
-- Pins: `torch==2.14.0`, `torchvision==0.29.0`, `timm==1.0.29`, `huggingface-hub==0.36.2`, `safetensors==0.8.0`, `numpy==2.5.3`, `pillow==11.3.0`; Python 3.12.
+- Pins: `torch==2.14.0`, `torchvision==0.29.0`, `torchaudio==2.11.0`, `timm==1.0.29`, `huggingface-hub==0.36.2`, `safetensors==0.8.0`, `numpy==2.5.3`, `pillow==11.3.0`; Python 3.12.
 - Precision: float32 on both CPU and CUDA; preprocessing resize (shorter side) 518 → centre-crop 518×518, bicubic, ImageNet mean/std from the snapshot `config.json`; pooling = class token after the final norm; L2 normalisation applied in `embed`.
 - Measured (claude-science WSL venv, RTX 5070 Ti, `HF_HUB_OFFLINE=1`): device `cuda:0`, source `local-snapshot`, load 3.36 s, embed (2 images) 1.22 s, total 4.58 s; output 2 × 384, norms 1.000000 / 1.000000, cosine between a synthetic 256×256 gradient and its 180° rotation 0.9667. CPU not measured.
 - Tests: `pytest -q -o addopts= tests` — 11 passed, offline, no weights required; `ruff check src tests` clean.

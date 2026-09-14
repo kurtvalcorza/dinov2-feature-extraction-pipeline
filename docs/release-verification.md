@@ -101,7 +101,7 @@ they are measurements for the stated runtime, not general estimates.
 
 | Date (UTC) | Commit / notebook blob | Executor | Path exercised | Wall | Outcome |
 |---|---|---|---|---|---|
-| | | | Default sample path | | pending — queued to the GPU lane |
+| 2026-09-14 | `347e21d` / `46d155ab2f9a` | Kaggle CPU (`kurtvalcorza/dimer-nb2-dinov2-feature-extraction` v1) | Default sample path | 194.1 s | **PASSED** — 8/8 ok code cells executed cleanly, 8 files, 88 MB staged |
 
 ## Current status
 
