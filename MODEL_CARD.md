@@ -7,7 +7,7 @@ date_published: "2023-05-09"
 date_published_source: "Hugging Face Hub repository creation date of the exact hosted checkpoint (`createdAt`, https://huggingface.co/api/models/timm/vit_small_patch14_dinov2.lvd142m)"
 ---
 
-# DINOv2 ViT-S/14 lvd142m (DIMER package v0.1.0) — Visual Feature Extraction
+# DINOv2 ViT-S/14 lvd142m — Visual Feature Extraction
 
 [![Hugging Face](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-timm%2Fvit__small__patch14__dinov2.lvd142m-ffcc4d?style=flat)](https://huggingface.co/timm/vit_small_patch14_dinov2.lvd142m)
 [![Upstream GitHub](https://img.shields.io/badge/Upstream%20GitHub-facebookresearch%2Fdinov2-181717?style=flat&logo=github&logoColor=white)](https://github.com/facebookresearch/dinov2)
