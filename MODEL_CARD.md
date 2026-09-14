@@ -2,6 +2,7 @@
 license: apache-2.0
 model_card_spec: "1.1"
 pipeline_tag: image-feature-extraction
+task: "Others - Image Feature Extraction"
 base_model: timm/vit_small_patch14_dinov2.lvd142m
 date_published: "2023-05-09"
 date_published_source: "Hugging Face Hub repository creation date of the exact hosted checkpoint (`createdAt`, https://huggingface.co/api/models/timm/vit_small_patch14_dinov2.lvd142m)"
