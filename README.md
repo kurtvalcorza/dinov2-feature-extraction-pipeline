@@ -72,3 +72,7 @@ print(len(vec), sum(v * v for v in vec))   # 384 1.0
 ## Licensing
 
 Repository code is Apache-2.0 (see `LICENSE`). The upstream weights are Apache-2.0; `docs/WEIGHTS.md` records how the stale `cc-by-nc-4.0` field in the snapshot `config.json` was resolved against the upstream re-licensing of 2023-08-31.
+
+## AI Assistance Disclosure
+
+This tutorial and its accompanying documentation were developed with generative AI assistance for code development and technical writing under maintainer direction. The maintainer remains responsible for reviewing the implementation, validating results, and making release decisions. AI assistance does not constitute independent verification, provider endorsement, or release approval.
