@@ -61,7 +61,7 @@ LVD-142M images are web photographs of varied, undocumented provenance — many 
 
 ###### Environment
 
-Operating environment: Python 3.12 with `torch==2.14.0`, `torchvision==0.29.0`, `timm==1.0.29`, `pillow==11.3.0` (exact pins in `pyproject.toml`). CUDA is optional; `from_pretrained` picks `cuda:0` when available, else CPU, and runs in float32 on both. On this repository's smoke run (claude-science WSL venv, RTX 5070 Ti 16 GB, two synthetic 256×256 images through `DINOv2FeatureExtractionPipeline.from_pretrained().embed`) loading the verified snapshot took 3.36 s and embedding the pair 1.22 s including transform and first-call CUDA warm-up; both vectors had unit norm and their cosine similarity was 0.9667 (a gradient and its 180° rotation). The CPU path is exercised only by the unit tests with an injected runner. Data environment: inputs are assumed to be natural photographs; the paper reports that DINOv2 features transfer to many domains without fine-tuning, but this pipeline measures nothing about that, and synthetic, medical or satellite imagery should be treated as untested.
+Operating environment: Python 3.12 with `torch==2.14.0`, `torchvision==0.29.0`, `torchaudio==2.11.0`, `timm==1.0.29`, `pillow==11.3.0` (exact pins in `pyproject.toml`). CUDA is optional; `from_pretrained` picks `cuda:0` when available, else CPU, and runs in float32 on both. On this repository's smoke run (claude-science WSL venv, RTX 5070 Ti 16 GB, two synthetic 256×256 images through `DINOv2FeatureExtractionPipeline.from_pretrained().embed`) loading the verified snapshot took 3.36 s and embedding the pair 1.22 s including transform and first-call CUDA warm-up; both vectors had unit norm and their cosine similarity was 0.9667 (a gradient and its 180° rotation). The CPU path is exercised only by the unit tests with an injected runner. Data environment: inputs are assumed to be natural photographs; the paper reports that DINOv2 features transfer to many domains without fine-tuning, but this pipeline measures nothing about that, and synthetic, medical or satellite imagery should be treated as untested.
 
 #### Metrics
 
@@ -117,7 +117,7 @@ The pipeline must not be used for surveillance, biometric identification, person
 
 ## Runtime
 
-- Pins: `torch==2.14.0`, `torchvision==0.29.0`, `timm==1.0.29`, `huggingface-hub==0.36.2`, `safetensors==0.8.0`, `numpy==2.5.3`, `pillow==11.3.0`; Python 3.12.
+- Pins: `torch==2.14.0`, `torchvision==0.29.0`, `torchaudio==2.11.0`, `timm==1.0.29`, `huggingface-hub==0.36.2`, `safetensors==0.8.0`, `numpy==2.5.3`, `pillow==11.3.0`; Python 3.12.
 - Precision: float32 on both CPU and CUDA; preprocessing resize (shorter side) 518 → centre-crop 518×518, bicubic, ImageNet mean/std from the snapshot `config.json`; pooling = class token after the final norm; L2 normalisation applied in `embed`.
 - Measured (claude-science WSL venv, RTX 5070 Ti, `HF_HUB_OFFLINE=1`): device `cuda:0`, source `local-snapshot`, load 3.36 s, embed (2 images) 1.22 s, total 4.58 s; output 2 × 384, norms 1.000000 / 1.000000, cosine between a synthetic 256×256 gradient and its 180° rotation 0.9667. CPU not measured.
 - Tests: `pytest -q -o addopts= tests` — 11 passed, offline, no weights required; `ruff check src tests` clean.
