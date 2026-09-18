@@ -1,119 +1,167 @@
 # Release verification
 
-`tutorials/dinov2_feature_extraction_colab.ipynb` (`TASK-INFERENCE`) is a **release candidate** until
-the exact notebook revision has executed top-to-bottom in a clean supported runtime. Unit tests,
-JSON validation, code-cell compilation, and `tools/validate_release_assets.py` are necessary
-checks but are **not** runtime evidence under DIMER Notebook Specification 1.1. This file is
-the durable release-gate record for the notebook.
+`tutorials/dinov2_feature_extraction_colab.ipynb` (`E2E`, **standalone** carrier) is a **release candidate** until
+the exact notebook revision has executed top-to-bottom in a clean supported runtime. Unit tests, JSON validation,
+code-cell compilation, the generator parity checks and `tools/validate_release_assets.py` are necessary checks but
+are **not** runtime evidence under DIMER Notebook Specification 2.0 (REL8). This file is the durable release-gate
+record for the notebook.
 
 ## Automatic coverage (static, every pull request)
 
 CI runs `tools/validate_release_assets.py`, which checks:
 
-- notebook JSON parses; every code cell compiles as plain Python (no `%`/`!` magics); no
-  persisted outputs or execution counts; no unresolved placeholder markers; every code cell
-  is preceded by an explanatory markdown cell;
-- exactly one tutorial notebook, named in `tutorials/README.md` with its `TASK-INFERENCE`
-  profile, the notebook-spec version and the standalone carrier; `metadata.dimer` declares that profile, spec `1.1`, `standalone: true` and `generated_from` (repository, generating revision, module SHA-256, generator);
-- the standalone carrier (ST1–ST6, PAR1–PAR3): no clone, repository install or repository import on the
-  primary path; exactly one cell tagged `embedded_module` equal to `src/dinov2_feature_extraction_pipeline/pipeline.py`
-  after the generator's documented rewrites; the inline `MANIFEST` equal to the committed snapshot manifest and the
-  inline `PINS` equal to the `pyproject.toml` runtime pins; the notebook byte-identical to `tools/build_notebook.py`
-  output; the pinned-install cell with its restart-on-stale-import guard; `NOTEBOOK_SOURCE` recorded in the export;
-- `MODEL_ID`/`MODEL_REVISION` are bound only in the carried module cell (and repeated in the inline manifest,
-  which the notebook asserts against the module before fetching), the revision is a 40-hex immutable commit, and the
-  same identity string appears in `README.md`, `MODEL_CARD.md`, and `docs/WEIGHTS.md` with no stray revisions;
+- notebook JSON parses; every code cell compiles as plain Python (no `%`/`!` magics); no persisted outputs or
+  execution counts; no unresolved placeholder markers; every code cell is preceded by an explanatory markdown cell;
+- exactly one tutorial notebook, named in `tutorials/README.md` with its `E2E` profile, the notebook-spec version
+  and the standalone carrier; `metadata.dimer` declares that profile, spec `2.0`, a §3.3 pedagogical mode,
+  `standalone: true` and `generated_from` (repository, revision, module SHA-256, generator);
+- the standalone carrier (ST1–ST8, PAR1–PAR4): no clone, repository install or repository import on the primary
+  path; one cell per carried module (`pipeline.py`, `metrics.py`, `samples.py`), each equal to its source after the
+  generator's documented rewrites; the inline `MANIFEST` equal to the committed 3-entry snapshot manifest and the
+  inline `PINS` equal to the `pyproject.toml` runtime pins; the notebook byte-identical (on LF) to
+  `tools/build_notebook.py` output for its recorded revision; the pinned-install cell with its
+  restart-on-stale-import guard; `NOTEBOOK_SOURCE` recorded in exports;
+- `MODEL_ID`/`MODEL_REVISION` bound only in the carried module cell (and repeated in the inline manifest, which the
+  notebook asserts against the module before fetching), the revision a 40-hex immutable commit, and the same
+  identity string in `README.md`, `MODEL_CARD.md` and `docs/WEIGHTS.md` with no stray revisions (the 180 photo
+  digests live in the carried `samples.py`, not in prose);
 - the profile-specific public-API calls (`stage_missing_files`, `verify_snapshot`,
-  `DINOv2FeatureExtractionPipeline.from_pretrained(weights_dir=...)`, `validate_inputs`, `embed`, `evaluation_report`),
-  the ceiling and contract print (`MAX_IMAGE_SIDE`, `MAX_BATCH`, `EMBED_DIM`, `POOLING`, `NORMALIZED`), the embedding
-  sanity checks (one vector per input, width equals `EMBED_DIM`, unit norm), the export, the learner-facing embedding
-  statements (representations not predictions, class-token pooling, one vector per image, no missing-data concept, no
-  metric helper, cosine check is qualitative only, no threshold shipped) and the gated-off BYOD default listed in
-  the validator; forbidden patterns (credential-in-URL, any `git clone` / `github.com` / repository import on the
-  primary path, a mutable `revision='main'`, direct `timm.create_model` / `from timm import` / `from torchvision import` /
-  `from transformers import` / `from huggingface_hub import` use **outside the carried module cell**, `trust_remote_code=True`,
-  `pickle.load`, `torch.load(`, `extractall(`);
-- `STATUS.md`, `README.md` and `tutorials/README.md` agree on one release-status token and no
-  document makes an unsupported release-grade, production-readiness or benchmark claim;
-- `MODEL_CARD.md` front matter, single H1, required heading order, and immutable provenance.
+  `DINOv2FeatureExtractionPipeline.from_pretrained(weights_dir=...)`, `fetch_corpus` from the pinned cache path,
+  `read_corpus` + `build_sample_dataset(seed=SPLIT_SEED)` / `load_byod_dataset`, `validate_dataset` per split,
+  `class_names`, `check_split_disjoint`, `observer_overlap`, `write_dataset_csv`, `validate_inputs` with the
+  oversized-image refusal probe, `pipe.embed` with the sanity checks and the two cosines, `majority_baseline`,
+  `pipe.knn_baseline`, `pipe.adapt(trainable_blocks=0)` with its frozen-policy assertion, `pipe.evaluate` on the
+  frozen policy and on the validation and test splits after the unfrozen policy with the floor assertion,
+  `pipe.adapt` with `trainable_blocks=TRAINABLE_BLOCKS` and `lr=LEARNING_RATE`, `pipe.classify` before and after, the
+  per-batch `evaluation_report`, `pipe.save_artifact`, `DINOv2FeatureExtractionPipeline.from_artifact` and the
+  reload-parity assertion, and the provenance fields `weight_format`, `weight_sha256` and the `corpus` block), the
+  six expected `outputs/` paths, the learner-facing statements (representations not predictions, supervised
+  adaptation under an explicit frozen-vs-unfrozen policy, the majority floor, the cosine 5-NN vote, the frozen and
+  unfrozen policies, lowest validation log-loss, cosine is a similarity not a score, no dispersion estimate, named
+  exclusions, the CC0 licence) and the gated-off BYOD default; forbidden patterns (credential-in-URL, any `git
+  clone` / `github.com` / repository import on the primary path, a mutable `revision='main'`, direct
+  `timm.create_model(` / `from timm` / `from huggingface_hub import` / `urllib.request` / `safetensors` /
+  `torch.optim` / `.backward(` / `pipe._model` / `cross_entropy(` / `torch.nn.Linear(` use **outside the carried
+  module cells**, `trust_remote_code=True`, `pickle.load`, `torch.load(` without `weights_only=True`,
+  `extractall(`);
+- `STATUS.md`, `README.md` and `tutorials/README.md` agree on one release-status token and no document makes an
+  unsupported release-grade, production-readiness or benchmark claim;
+- `MODEL_CARD.md` front matter (`model_card_spec: "1.1"`), single H1, the 19 required headings in order, and the
+  immutable provenance section.
 
-CI also installs the pinned CPU-only `torch`/`torchvision` wheels plus `timm`, runs `ruff`, `tools/build_notebook.py --check`, and the
-offline unit suite (`tests/test_pipeline.py`, `tests/test_role_helpers.py`, `tests/test_notebook_parity.py`; injected runner, no weights). These are
-source/provenance and unit checks. They are **not** execution evidence.
+CI also installs the pinned CPU-only torch wheel plus `timm`, `huggingface-hub`, `safetensors`, `numpy` and
+`pillow`, runs `ruff check src tests tools`, `tools/build_notebook.py --check`, and the offline unit suite
+(`tests/test_pipeline.py`, `tests/test_adaptation.py`, `tests/test_role_helpers.py`, `tests/test_import_boundary.py`,
+`tests/test_notebook_parity.py`; injected mean-colour runner and corpus fetcher, synthetic JPEG swatches, temporary
+manifests, no weights — `tests/test_model_backed.py` is skipped without the snapshot). These are source/provenance and
+unit checks. They are **not** execution evidence.
 
 ## Executor paths
 
 | Path | Runtime | Role |
 |---|---|---|
-| Google Colab (supported user path) | Colab CPU runtime (CUDA used automatically when present) | The runtime the tutorial is written for; a clean top-to-bottom run here is promotion evidence |
-| Kaggle CLI kernel | Kaggle CPU kernel, Python 3.12 image | Reproducible clean-room executor of the same class; the notebook is pushed verbatim plus one leading shim cell that provides `google.colab` and chdirs to a scratch directory (no repository checkout is needed — the notebook is standalone) |
-| Local WSL harness (pre-flight only) | Workstation, sequential cell executor with a `google.colab` shim | Builder pre-flight to catch defects before spending cloud runs; **not** a supported runtime and not promotion evidence |
+| Google Colab (supported user path) | Colab CPU runtime (CUDA used automatically when present; float32 either way) | The runtime the tutorial is written for; a clean top-to-bottom run here is promotion evidence |
+| Kaggle CLI kernel or equivalent fresh container | Fresh CPU or GPU container, Python 3.12 image; the committed notebook executed verbatim in a fresh interpreter with a `google.colab` shim and **no repository checkout** (the notebook is standalone) | Reproducible clean-room executor of the same class; needed whenever the hosted kernel pre-imports a NumPy, Pillow or torch that differs from the `pyproject.toml` pins, because the tutorial's fail-closed stale-import guard correctly halts the in-kernel path after the pinned install |
+| Local harness (pre-flight only) | Workstation, sequential cell executor with a `google.colab` shim, pre-staged pins, `CUDA_VISIBLE_DEVICES=-1` | Builder pre-flight to catch defects before spending cloud runs; **not** a supported runtime and **not** promotion evidence |
 
 ## Supported release verification procedure
 
 Before changing the registry status from `Candidate` to `Release-grade`:
 
 1. resolve the exact PR/commit head under review and confirm static CI is green;
-2. open that exact notebook revision in a new CPU (or CUDA) runtime (Colab, or the Kaggle
-   executor above) with **no repository checkout** and a clean model cache;
-3. run the notebook top-to-bottom without editing implementation cells (form parameters at their
-   defaults for the sample path: `USE_BYOD = False`);
+2. open that exact notebook revision in a new CPU or CUDA runtime (Colab, or a fresh-container executor above) with
+   **no repository checkout**, an empty Hugging Face cache, and no pre-staged files under the working-directory
+   snapshot `weights/vit-small-dinov2/` or the photo cache `weights/inat-birds/` (the standalone path writes the
+   manifest itself, stages the missing file from the Hub, and fetches the 180 pinned photographs from the
+   iNaturalist open-data bucket, so neither directory may be seeded);
+3. run the notebook top-to-bottom without editing implementation cells (form parameters at their defaults:
+   `USE_BYOD = False`, `SPLIT_SEED = 42`, `PROBE_STEPS = 300`, `PROBE_LR = 0.01`, `EPOCHS = 4`,
+   `LEARNING_RATE = 3e-5`, `BATCH_SIZE = 8`, `TRAINABLE_BLOCKS = 2`);
 4. verify that Section 1 reports `NOTEBOOK_SOURCE.repository_revision` equal to the revision recorded in
-   `metadata.dimer.generated_from` and that the installed core package versions equal the inline `PINS` (= `pyproject.toml`);
+   `metadata.dimer.generated_from` and that the installed core package versions equal the inline `PINS`
+   (= `pyproject.toml`): `torch==2.14.0`, `torchvision==0.29.0`, `timm==1.0.29`, `huggingface-hub==0.36.2`,
+   `safetensors==0.8.0`, `numpy==2.5.3`, `pillow==11.3.0` (an interpreter restart after the install is expected
+   where the runtime's preinstalled torch, numpy or Pillow differ from the pins);
 5. verify every default-path stage completes:
    - pinned runtime installed from the inline `PINS` with no GitHub access;
-   - the carried module cell executes (defines the pipeline class and both role helpers) with no import of the
-     repository package;
-   - the three synthetic 256 x 256 images generated in code with their pixel SHA-256 values printed, and the
-     ceilings (`MAX_IMAGE_SIDE` 4096, `MAX_BATCH` 32) plus the contract (`EMBED_DIM` 384, `POOLING` `cls`,
-     `NORMALIZED` true) surfaced before the model runs;
-   - pinned `timm/vit_small_patch14_dinov2.lvd142m` acquisition at the immutable revision through the package:
-     the inline `MANIFEST` is asserted against the module identity and written to `weights/vit-small-dinov2/`,
-     `stage_missing_files(WEIGHTS_DIR, allow_download=True)` reports all three manifest entries
-     (`README.md`, `config.json`, `model.safetensors`) on a clean runtime, `verify_snapshot` returns the manifest dict,
-     and `from_pretrained(weights_dir=WEIGHTS_DIR)` reports `source == 'local-snapshot'` with the resolved 518 x 518
-     input size;
-   - `validate_inputs` writes `outputs/dinov2_feature_extraction_input_manifest.json` (verdict `accepted`, one
-     recorded rejection finding from the oversized probe);
-   - embedding through `embed(...)` with one 384-float unit-norm vector per input, in input order, and all four
-     sanity checks true;
-   - `evaluation_report` writes `outputs/dinov2_feature_extraction_evaluation_report.json` with verdict
-     `not-measurable` and the downstream-task `needs` text, and the pairwise cosine matrix printed as a qualitative
-     check (the rotated copy expected to score higher against the original than the flat block);
-   - `outputs/dinov2_feature_extraction_result.json` written with every vector keyed by its identifier, the contract,
-     the cosine matrix, `NOTEBOOK_SOURCE`, model revision, model licence, runtime versions and device;
-6. verify the export exists and the interpretation section matches the observed path;
-7. record the notebook Git blob id, commit, runtime (platform, Python, PyTorch, timm, device),
-   model identifier and immutable revision, whether the model cache was clean, outcome, produced
-   outputs, and any warning or applicable `SHOULD` deviation in the table below;
+   - the three carried module cells execute (defining `DINOv2FeatureExtractionPipeline`, `verify_snapshot`,
+     `stage_missing_files`, `validate_inputs`, `evaluation_report`, `classification_metrics`, `majority_baseline`,
+     `knn_predict`, `SAMPLE_RECORDS`, `SPECIES`, `fetch_corpus`, `read_corpus`, `build_sample_dataset`,
+     `validate_dataset`, `class_names`, `check_split_disjoint`, `observer_overlap`, `split_dataset`,
+     `load_byod_dataset`, `write_dataset_csv` and the ceilings) with no import of the repository package;
+   - the inline manifest asserted against the module's constants, then `stage_missing_files(WEIGHTS_DIR,
+     allow_download=True)` reporting `['model.safetensors']` (and any other absent entry) fetched from
+     `timm/vit_small_patch14_dinov2.lvd142m` at the immutable revision, and `verify_snapshot` returning its dict
+     (3 files); `from_pretrained(weights_dir=WEIGHTS_DIR)` loading from the verified directory with `source`
+     `local-snapshot` and `input_size` 518 × 518;
+   - Section 4: `fetch_corpus` fetching the 180 pinned photographs (19,183,071 bytes) from
+     `inaturalist-open-data.s3.amazonaws.com` into `weights/inat-birds/`, six species of 30 read, and the seeded
+     stratified draw of 108 / 24 / 48 records with `check_split_disjoint` reporting no shared photograph, the observer
+     overlap counted (31 of 117 observers in more than one split in the recorded run) and the three dataset digests
+     `__DIG_TRAIN__` / `__DIG_VAL__` / `__DIG_TEST__`; `outputs/…_train.csv` written; the four dataset refusal probes each
+     raising `ValueError`;
+   - Section 5: the ceilings (`MAX_IMAGE_SIDE` 4096, `MAX_BATCH` 32) and the contract (`EMBED_DIM` 384, `POOLING`
+     `cls`, `NORMALIZED` `True`, `TRANSFORMER_BLOCKS` 12, `PARAMETER_COUNT` 22,056,192) surfaced; `validate_inputs`
+     writing `outputs/…_input_manifest.json` (verdict `accepted`, one recorded rejection finding from the oversized
+     probe); `embed` on three test photographs with all four sanity checks `True` and the same-species / other-species
+     cosines printed;
+   - Section 6: the majority floor (16.7 % accuracy), the cosine 5-NN vote (≈ 83.3 % on the sample), and the
+     frozen policy — `adapt(trainable_blocks=0)` reporting `frozen backbone + linear probe` with its validation
+     metrics — scored on the test split (≈ 83.3 % accuracy, macro-F1 ≈ 0.836) on CPU float32, with the
+     cell's assertion that the probe beats the floor and the policy is the frozen one;
+   - Section 7: `pipe.adapt` printing epoch 0 as the linear probe (validation log-loss ≈ 0.073), then
+     4 unfreeze epochs of the last two blocks (3,550,464 trainable of 22,056,192 parameters plus
+     the 2,310-parameter head) with validation log-loss / accuracy each epoch (0.073 (100.0 %) → 0.098 (95.8 %) → 0.092 (95.8 %) → 0.022 (100.0 %) → 0.041 (100.0 %) in the recorded run) and
+     the selected policy `unfrozen last 2 blocks + linear head` (`best_epoch` 3);
+   - Section 8: `pipe.evaluate` on the validation and test splits with the four-way comparison, per-class recall and
+     the confusion matrix, and `outputs/…_evaluation_report.json` written (the cell asserts the selected model beats
+     the majority floor — on the sample ≈ 83.3 % versus 16.7 %; the delta over the probe, +0.0
+     points, is reported, not asserted);
+   - Section 9: six test photographs labelled by the selected model and by a fresh frozen-policy probe, printed with
+     the gold species and top probabilities, the per-batch `evaluation_report` verdict `not-measurable`,
+     `outputs/…_predictions.csv` written; `pipe.save_artifact` writing `outputs/…_adapter/{adapter.safetensors,
+     manifest.json}` (30 tensors, about 14.2 MB, `classes` and `policy` recorded) and
+     `DINOv2FeatureExtractionPipeline.from_artifact` reloading it with identical probabilities on the six images and
+     an identical test accuracy (the cell asserts both); `outputs/…_result.json` written with `NOTEBOOK_SOURCE`, the
+     model identity and licence, the snapshot block (`weight_format`, `weight_sha256`), the `corpus` block, the
+     inference-contract items, the comparison, the before/after predictions, the artifact digest and policy, the
+     reload parity, the runtime versions and device;
+6. verify the exports exist and the interpretation section matches the observed path;
+7. record the notebook Git blob id, commit, runtime (platform, Python, PyTorch, timm, device), the model identifier
+   and immutable revision, whether the model cache, the weights directory and the photo cache were clean, outcome,
+   produced outputs, the observed metrics and the selected policy (as observations, not a benchmark) and any warning
+   or applicable `SHOULD` deviation in the tables below;
 8. record no access tokens or other secrets.
 
-A known-failing default path in the supported runtime blocks release.
+A known-failing default path in the supported runtime blocks release (REL11).
+
+## Manual clean-runtime evidence
+
+| Notebook | Commit / notebook blob | Date (UTC) | Executor | Outcome |
+|---|---|---|---|---|
+| `dinov2_feature_extraction_colab.ipynb` (`E2E`) | `__LOCAL_ROW__` | 2026-09-19 | Local pre-flight harness (Windows, CPython 3.12.10, CPU, `google.colab` shim, pins pre-installed) | PASS — pre-flight only, **not** promotion evidence |
+| `dinov2_feature_extraction_colab.ipynb` (`TASK-INFERENCE`, superseded) | `347e21d` / `46d155ab2f9a` | 2026-09-14 | Kaggle CPU (`kurtvalcorza/dimer-nb2-dinov2-feature-extraction` v1) | PASSED — 8/8 code cells, 194.1 s, 88 MB staged; evidence for the earlier inference-only notebook, not for the `E2E` blob |
 
 ## Recorded executions
 
 Notebook identity is the Git blob id of `tutorials/dinov2_feature_extraction_colab.ipynb` (verify with
-`git rev-parse <commit>:tutorials/dinov2_feature_extraction_colab.ipynb`). Wall times, when recorded,
-are the sum of per-cell times reported by the executor and include installs and the model download;
-they are measurements for the stated runtime, not general estimates.
-
-### Manual clean-runtime evidence
+`git rev-parse <commit>:tutorials/dinov2_feature_extraction_colab.ipynb`). Wall times are the sum of per-cell times
+reported by the executor and include the model download where it occurred; they are measurements for the stated
+runtime, not general estimates.
 
 | Date (UTC) | Commit / notebook blob | Executor | Path exercised | Wall | Outcome |
 |---|---|---|---|---|---|
-| 2026-09-14 | `347e21d` / `46d155ab2f9a` | Kaggle CPU (`kurtvalcorza/dimer-nb2-dinov2-feature-extraction` v1) | Default sample path | 194.1 s | **PASSED** — 8/8 ok code cells executed cleanly, 8 files, 88 MB staged |
+| 2026-09-19 | `__LOCAL_ROW__` | Local pre-flight harness (Windows, CPython 3.12.10, CPU float32, `torch 2.14.0+cu130` with `CUDA_VISIBLE_DEVICES=-1`, `timm 1.0.29`) | `__LOCAL_EXEC__` |
+| 2026-09-14 | `347e21d` / `46d155ab2f9a` (`TASK-INFERENCE`, superseded) | Kaggle CPU (`kurtvalcorza/dimer-nb2-dinov2-feature-extraction` v1) | Default sample path of the inference-only notebook: three synthetic images, `stage_missing_files` fetching `model.safetensors` from the Hub, `verify_snapshot` over 3 files, `embed` with its sanity checks and a qualitative cosine table, `not-measurable` report, CSV + JSON exports | 194.1 s | **PASSED** — 8/8 code cells, 88 MB staged; history only |
 
 ## Current status
 
-No clean-runtime execution of the notebook has been recorded yet; the run is **pending** and queued
-to the GPU lane. Static validation (`tools/validate_release_assets.py`), nbformat validation, a
-`compile()` sweep over every code cell, and the offline unit suite passed on the tutorial source at
-the candidate revision, which is necessary but not sufficient. The registry status remains
-**Candidate** until a reviewer confirms a recorded run against the notebook blob under review and
-an integrator promotes it; promotion is not performed by the builder. Two facts a reviewer should
-weigh: `stage_missing_files` was exercised only with an injected downloader in the unit suite (the
-real `hf_hub_download` fetch of all three manifest entries into a fresh `weights/vit-small-dinov2/` has not been
-executed), and the standalone carrier itself — executing the carried module cell in a runtime that has no
-repository checkout — has been validated statically only (parity PASS), never run; the earlier local GPU smoke run
-used the verified snapshot on CUDA through the installed package, so the clean run will be the first execution of
-the standalone path, of the staging path, and of the CPU embedding path against the real weights.
+The `E2E` notebook source is complete and passes all static checks, including the generator parity checks
+(`--check` OK). A local pre-flight execution of the committed blob completed the whole default path on CPU —
+photographs read from the cache, validation and split, the embedding contract, the majority floor, the k-NN vote,
+the frozen-policy probe, the unfrozen policy with validation selection, held-out evaluation, before/after
+predictions, adapter export and reload parity — which catches defects but is **not** a supported runtime under
+REL1/REL10, and it ran with the snapshot and the 180 photographs pre-staged, so neither the 88 MB Hub fetch nor the
+19 MB photo download has been exercised by this notebook end to end; the earlier `TASK-INFERENCE` Kaggle run did
+exercise the Hub fetch and digest check of the same snapshot. The repository stays at **Candidate** until a Colab or
+fresh-container run of the exact `E2E` release revision is recorded above.

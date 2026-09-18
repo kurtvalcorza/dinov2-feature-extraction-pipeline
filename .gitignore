@@ -15,3 +15,6 @@ weights/**/*.pt
 weights/**/*.pth
 weights/**/*.onnx
 weights/**/.cache/
+
+# Pinned iNaturalist photo cache (fetched at run time, not redistributed)
+weights/inat-birds/
