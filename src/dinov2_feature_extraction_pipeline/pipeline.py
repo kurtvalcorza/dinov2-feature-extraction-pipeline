@@ -52,6 +52,8 @@ MAX_EVAL_RECORDS = 2_000
 MIN_SCORED_RECORDS = 50  # below this a scored dataset is labelled a small sample
 ARTIFACT_FORMAT = "org.valcorza.vit-small-dinov2.adapter.v1"
 ARTIFACT_FORMAT_VERSION = "1.0"
+POLICY_FROZEN = "frozen backbone + linear probe"
+POLICY_UNFROZEN = "unfrozen last {k} blocks + linear head"
 ARTIFACT_WEIGHTS_NAME = "adapter.safetensors"
 ARTIFACT_MANIFEST_NAME = "manifest.json"
 
@@ -490,7 +492,7 @@ class DINOv2FeatureExtractionPipeline:
             probe_opt.step()
             probe_losses.append(float(loss.detach()))
         head.eval()
-        self._head, self.classes, self.adapter = head, classes, {"policy": "frozen backbone + linear probe"}
+        self._head, self.classes, self.adapter = head, classes, {"policy": POLICY_FROZEN}
 
         def score_val() -> dict[str, Any] | None:
             if not val_checked:
@@ -532,43 +534,59 @@ class DINOv2FeatureExtractionPipeline:
             )
             generator = torch.Generator().manual_seed(seed)
             tensors = [self._transform(r["image"]) for r in train_checked]
-            for epoch in range(1, epochs + 1):
-                model.train()
-                head.train()
-                order = torch.randperm(len(train_checked), generator=generator).tolist()
-                losses = []
-                for start in range(0, len(order), batch_size):
-                    chosen = order[start : start + batch_size]
-                    batch = torch.stack([tensors[i] for i in chosen]).to(device)
-                    feats = torch.nn.functional.normalize(model(batch).float(), dim=-1)
-                    loss = torch.nn.functional.cross_entropy(head(feats.cpu()), y_train[chosen])
-                    optimiser.zero_grad(set_to_none=True)
-                    loss.backward()
-                    torch.nn.utils.clip_grad_norm_(block_params + list(head.parameters()), 1.0)
-                    optimiser.step()
-                    losses.append(float(loss.detach()))
-                model.eval()
-                head.eval()
-                self.adapter = {"policy": f"unfrozen last {trainable_blocks} blocks + linear head"}
-                entry = {
-                    "epoch": epoch,
-                    "stage": f"unfrozen last {trainable_blocks} blocks",
-                    "train_loss": sum(losses) / max(len(losses), 1),
-                    "val": score_val(),
-                }
-                history.append(entry)
-                if progress:
-                    progress(entry)
-                current = entry["val"]["log_loss"] if entry["val"] else -math.inf
-                if current < best_loss or not entry["val"]:
-                    best_loss = current
-                    best_state = {
-                        "head": {k: v.detach().clone() for k, v in head.state_dict().items()},
-                        "blocks": {
-                            k: v.detach().clone() for k, v in model.state_dict().items() if k in wanted
-                        },
+            head.to(device)  # no per-batch GPU<->CPU gradient copies; moved back before the head is used
+            y_device = y_train.to(device)
+            initial_blocks = {k: v.clone() for k, v in best_state["blocks"].items()}
+            try:
+                for epoch in range(1, epochs + 1):
+                    model.train()
+                    head.train()
+                    order = torch.randperm(len(train_checked), generator=generator).tolist()
+                    losses = []
+                    for start in range(0, len(order), batch_size):
+                        chosen = order[start : start + batch_size]
+                        batch = torch.stack([tensors[i] for i in chosen]).to(device)
+                        feats = torch.nn.functional.normalize(model(batch).float(), dim=-1)
+                        loss = torch.nn.functional.cross_entropy(head(feats), y_device[chosen])
+                        optimiser.zero_grad(set_to_none=True)
+                        loss.backward()
+                        torch.nn.utils.clip_grad_norm_(block_params + list(head.parameters()), 1.0)
+                        optimiser.step()
+                        losses.append(float(loss.detach()))
+                    model.eval()
+                    head.eval()
+                    self.adapter = {"policy": POLICY_UNFROZEN.format(k=trainable_blocks)}
+                    entry = {
+                        "epoch": epoch,
+                        "stage": f"unfrozen last {trainable_blocks} blocks",
+                        "train_loss": sum(losses) / max(len(losses), 1),
+                        "val": score_val(),
                     }
-                    best_epoch = epoch
+                    history.append(entry)
+                    if progress:
+                        progress(entry)
+                    current = entry["val"]["log_loss"] if entry["val"] else -math.inf
+                    if current < best_loss or not entry["val"]:
+                        best_loss = current
+                        best_state = {
+                            "head": {k: v.detach().cpu().clone() for k, v in head.state_dict().items()},
+                            "blocks": {
+                                k: v.detach().clone() for k, v in model.state_dict().items() if k in wanted
+                            },
+                        }
+                        best_epoch = epoch
+            except BaseException:
+                # Transactional: a failure in training, validation or the progress callback leaves the base
+                # exactly as it was, frozen, with no head or adapter attached.
+                restore = dict(model.state_dict())
+                restore.update(initial_blocks)
+                model.load_state_dict(restore, strict=True)
+                model.eval()
+                for param in model.parameters():
+                    param.requires_grad_(False)
+                self._head, self.classes, self.adapter = None, [], None
+                raise
+            head.cpu()
             merged = dict(model.state_dict())
             merged.update(best_state["blocks"])
             model.load_state_dict(merged, strict=True)
@@ -579,11 +597,7 @@ class DINOv2FeatureExtractionPipeline:
                 param.requires_grad_(False)
         for p in head.parameters():
             p.requires_grad_(False)
-        policy = (
-            "frozen backbone + linear probe"
-            if best_epoch == 0 or not names
-            else f"unfrozen last {trainable_blocks} blocks + linear head"
-        )
+        policy = POLICY_FROZEN if best_epoch == 0 or not names else POLICY_UNFROZEN.format(k=trainable_blocks)
         self._head, self.classes = head, classes
         self.adapter = {
             "policy": policy,
@@ -656,12 +670,22 @@ class DINOv2FeatureExtractionPipeline:
         )
         return out
 
-    def load_artifact(self, artifact_dir: str | Path) -> dict[str, Any]:
-        """Verify an adapter's manifest and digest, rebuild the head and overlay its block tensors."""
-        root = Path(artifact_dir)
-        manifest = json.loads((root / ARTIFACT_MANIFEST_NAME).read_text(encoding="utf-8"))
+    def _check_artifact_manifest(
+        self, root: Path, manifest: Mapping[str, Any]
+    ) -> tuple[Path, list[str], int]:
+        """Refuse an artifact whose manifest is not exactly the one this pipeline writes: the supported format
+        and version, the pinned base (id, revision, weight file, digest), exactly one file entry named
+        `adapter.safetensors` that resolves inside the artifact directory, at least two unique classes, a
+        canonical policy and an integer `trainable_blocks` in range. Nothing is deserialised here. The
+        digest check that follows detects corruption or drift of the weights relative to the adjacent
+        manifest; it is not authenticity against an actor who can replace both files."""
         if manifest.get("format") != ARTIFACT_FORMAT:
             raise ValueError(f"artifact format {manifest.get('format')!r} != {ARTIFACT_FORMAT!r}")
+        if manifest.get("format_version") != ARTIFACT_FORMAT_VERSION:
+            raise ValueError(
+                f"artifact format_version {manifest.get('format_version')!r} is not the supported "
+                f"{ARTIFACT_FORMAT_VERSION!r}"
+            )
         base = manifest.get("base_model", {})
         if (base.get("id"), base.get("revision"), base.get("weight_sha256")) != (
             MODEL_ID,
@@ -669,21 +693,64 @@ class DINOv2FeatureExtractionPipeline:
             WEIGHT_SHA256,
         ):
             raise ValueError("artifact was adapted from a different base model, revision or weight file")
+        if base.get("weight_file", WEIGHTS_FILE) != WEIGHTS_FILE:
+            raise ValueError("artifact was adapted from a different base weight file")
+        files = manifest.get("files")
+        if not isinstance(files, list) or len(files) != 1:
+            raise ValueError("artifact manifest must list exactly one file")
+        entry = files[0]
+        if not isinstance(entry, Mapping) or entry.get("path") != ARTIFACT_WEIGHTS_NAME:
+            raise ValueError(f"artifact manifest must name exactly {ARTIFACT_WEIGHTS_NAME!r}")
+        weights_path = (root / entry["path"]).resolve()
+        if weights_path.parent != root.resolve():
+            raise ValueError("artifact weight path must resolve inside the artifact directory")
+        adapter = manifest.get("adapter")
+        if not isinstance(adapter, Mapping):
+            raise ValueError("artifact manifest has no adapter block")
+        classes = list(adapter.get("classes") or [])
+        if (
+            len(classes) < 2
+            or len(set(classes)) != len(classes)
+            or not all(isinstance(c, str) for c in classes)
+        ):
+            raise ValueError("artifact manifest does not name at least two unique classes")
+        blocks = adapter.get("trainable_blocks")
+        if isinstance(blocks, bool) or not isinstance(blocks, int) or not 0 <= blocks <= TRANSFORMER_BLOCKS:
+            raise ValueError(
+                f"artifact manifest does not record an integer trainable_blocks in 0..{TRANSFORMER_BLOCKS}"
+            )
+        policy = adapter.get("policy")
+        if policy == POLICY_FROZEN:
+            blocks = 0
+        elif policy != POLICY_UNFROZEN.format(k=blocks) or blocks == 0:
+            raise ValueError(
+                f"artifact policy {policy!r} is not a canonical policy for trainable_blocks={blocks}"
+            )
+        if not isinstance(manifest.get("tensors"), list):
+            raise ValueError("artifact manifest must list its tensors")
+        return weights_path, classes, blocks
+
+    def load_artifact(self, artifact_dir: str | Path) -> dict[str, Any]:
+        """Verify an adapter's manifest, digest and exact tensor set **before** deserialising, rebuild
+        the head and overlay its block tensors (none under the frozen policy)."""
+        root = Path(artifact_dir)
+        manifest = json.loads((root / ARTIFACT_MANIFEST_NAME).read_text(encoding="utf-8"))
+        weights_path, classes, blocks = self._check_artifact_manifest(root, manifest)
         entry = manifest["files"][0]
-        weights_path = root / entry["path"]
         if not weights_path.is_file():
             raise FileNotFoundError(f"artifact weights missing: {weights_path}")
         if _sha256(weights_path) != entry["sha256"] or weights_path.stat().st_size != entry["bytes"]:
             raise ValueError(f"{entry['path']}: digest or size mismatch; refusing to load")
-        classes = list(manifest.get("adapter", {}).get("classes") or [])
-        if len(classes) < 2:
-            raise ValueError("artifact manifest does not name at least two classes")
+        # The exact tensor set the recorded policy implies: the head, plus the last `blocks` blocks only.
+        expected = sorted(["head.bias", "head.weight", *self._trainable_names(blocks)])
+        if sorted(manifest["tensors"]) != expected:
+            raise ValueError("artifact tensor list does not match its recorded policy and trainable_blocks")
         model = self._require_model()
         import torch
         from safetensors.torch import load_file
 
         tensors = load_file(str(weights_path))
-        if sorted(tensors) != manifest["tensors"]:
+        if sorted(tensors) != expected:
             raise ValueError("artifact tensor names differ from its manifest")
         if (
             tuple(tensors.get("head.weight", torch.empty(0)).shape) != (len(classes), EMBED_DIM)
