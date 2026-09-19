@@ -43,8 +43,10 @@ SPECIES: dict[str, tuple[str, str]] = {
     "house_finch": ("Haemorhous mexicanus", "House Finch"),
     "american_goldfinch": ("Spinus tristis", "American Goldfinch"),
 }
-# (id, label, iNat photo id, iNat observation id, observer login, bytes, sha256 of <photo id>/medium.jpg)
-SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
+# (id, label, iNat photo id, iNat observation id, observer login, bytes, sha256 of the served
+#  <photo id>/medium.<ext>, ext) — the bucket serves each photo under its original extension
+#  (jpg or jpeg); the digest pins the served bytes
+SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str, str], ...] = (
     (
         "song_sparrow-00",
         "song_sparrow",
@@ -53,6 +55,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "andywilson",
         43427,
         "7a9d9304a82f202e992655ec5f65477cd3d7c1dce03aa89a214c2daa38f9d61d",
+        "jpg",
     ),
     (
         "song_sparrow-01",
@@ -62,6 +65,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "lyneisfilm",
         162073,
         "11f77ff277dd2703c1000f2c787136ff0c3ca7ffad7017056892fe789d65efec",
+        "jpg",
     ),
     (
         "song_sparrow-02",
@@ -71,6 +75,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "swpollinators",
         27899,
         "4e70b9519c6e5f7384a4495b91b45465f2b1599f86491d8f9f9b12635a4046f6",
+        "jpg",
     ),
     (
         "song_sparrow-03",
@@ -80,6 +85,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "radrat",
         70961,
         "1211da4fdb24ae85ef0c6c3e2d03542c430457856aec661fe8f5f2de0027eee5",
+        "jpeg",
     ),
     (
         "song_sparrow-04",
@@ -89,6 +95,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "k-simpkins",
         58410,
         "255538cf450197257e86ed3d41dc69fb78e594434e9cb338c6314288c6cff26e",
+        "jpg",
     ),
     (
         "song_sparrow-05",
@@ -98,6 +105,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "ben142",
         220573,
         "1ae24622888d9d449ffd6b5c65cac1b9b14870fd8e12dbed8aa0acc2f5030123",
+        "jpg",
     ),
     (
         "song_sparrow-06",
@@ -107,6 +115,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "rawcomposition",
         25012,
         "d2cde085277a71886a2bf211a1eec26941a73752375708726a8af29aa4995a8b",
+        "jpg",
     ),
     (
         "song_sparrow-07",
@@ -116,6 +125,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "davidfbird",
         110773,
         "0feee62753f409d0aa365e9aa017ddef436ad70a2673dc847feb3b5386af27ff",
+        "jpg",
     ),
     (
         "song_sparrow-08",
@@ -125,6 +135,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "gcart043",
         98482,
         "a662a6abb24f42b256fb6e2d6f02c3e128a1053ef534f454461aa5cadcc03fe4",
+        "jpeg",
     ),
     (
         "song_sparrow-09",
@@ -134,6 +145,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "glennberry",
         102702,
         "64333977d24957d723a1d26886004f222d810557617685579f72a6b553e508fa",
+        "jpg",
     ),
     (
         "song_sparrow-10",
@@ -143,6 +155,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "sooji",
         136572,
         "a5cebbc0cc2325d3805c4ac854e103f7ba1c22e3a34fb204f30d58681e865033",
+        "jpg",
     ),
     (
         "song_sparrow-11",
@@ -152,6 +165,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "jeanpaulboerekamps",
         98601,
         "4301f06b52b8dcf1e137567c32412e384edb71cb90e2e35459a0405b2e56529b",
+        "jpg",
     ),
     (
         "song_sparrow-12",
@@ -161,6 +175,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "w_mark_c",
         190819,
         "6b6057a1c50b83ffeb4d9e34367b3e6a9b355236dbcae9820b509e1484f8fe33",
+        "jpg",
     ),
     (
         "song_sparrow-13",
@@ -170,6 +185,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "erikschiff",
         107695,
         "27aecce184a485ee888c0e8101cb4a34899b8a185b62dc064f3dc2ec9902182b",
+        "jpg",
     ),
     (
         "song_sparrow-14",
@@ -179,6 +195,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "nathanael15",
         51441,
         "5ae55f868e779a4e8ee34f6ad077b40c41f20aa699d967f373ebd659a89137a8",
+        "jpg",
     ),
     (
         "song_sparrow-15",
@@ -188,6 +205,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "dugald",
         52496,
         "e483364889fb95c540db84b5edf5a2400febf7d2eb62a1e49303b13ad329d1b8",
+        "jpg",
     ),
     (
         "song_sparrow-16",
@@ -197,6 +215,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "carterdorscht",
         166662,
         "d0cdd9ddcf7202a91ac2c47910a0c230639bce50283e8511fb8311151763233a",
+        "jpeg",
     ),
     (
         "song_sparrow-17",
@@ -206,6 +225,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "tys_rbg",
         126820,
         "515b3b32b64e88d401990bfd1d8e2c1281443b5d1e763a09e86d3d3664e1df41",
+        "jpg",
     ),
     (
         "song_sparrow-18",
@@ -215,6 +235,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "irenemacaulay_",
         101681,
         "22e326807de963352b4307790bd40c5506adb0fab1f9844968edaf4bc5665e1c",
+        "jpg",
     ),
     (
         "song_sparrow-19",
@@ -224,6 +245,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "sean579",
         42820,
         "5eb0031a8d6066650c66b265fb1724413273e095e4e531054d2817eb75910074",
+        "jpg",
     ),
     (
         "song_sparrow-20",
@@ -233,6 +255,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "jamesadney",
         112564,
         "6e94bce1b5135f48b0b19b64e21a0c76cff4f9b9a28fcbc2b7f5c8ddda6ef513",
+        "jpg",
     ),
     (
         "song_sparrow-21",
@@ -242,6 +265,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "joy4birds",
         70552,
         "aa767aa5a74a76cfd985aba5282e589f670a9ce0a8fcdc6a096c0357992dec67",
+        "jpg",
     ),
     (
         "song_sparrow-22",
@@ -251,6 +275,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "zorthesosen",
         214044,
         "6a70dba26dfb3e98a244a9ec9badb812ddaa8b3612e7a36f66aba057bb757ecd",
+        "jpg",
     ),
     (
         "song_sparrow-23",
@@ -260,6 +285,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "truthseqr",
         82521,
         "4186fbf344e92038358d4338102aa440098bff5f558ab1d197f72fefbcec0b15",
+        "jpeg",
     ),
     (
         "song_sparrow-24",
@@ -269,6 +295,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "glmory",
         297964,
         "e8cab773436ccfaad4699e5112ef4edb516236d413d6dbf034eea7bf9c88c8f5",
+        "jpg",
     ),
     (
         "song_sparrow-25",
@@ -278,6 +305,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "funvill",
         72572,
         "0a694b5bb03aee6eb5a3a6132e855d47172b21b84cc4cc7c64367d1a31de7894",
+        "jpeg",
     ),
     (
         "song_sparrow-26",
@@ -287,6 +315,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "gambolingquail",
         69559,
         "6a92bff4fc76820c6f21e15c5f254385dd976a32264911bfc08417a1c2bf053d",
+        "jpg",
     ),
     (
         "song_sparrow-27",
@@ -296,6 +325,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "reuvenm",
         74010,
         "3e3c5e94c839f45610ef3ef7ffaf3575f4bfe365fc94454c30bfdb718ca3c593",
+        "jpeg",
     ),
     (
         "song_sparrow-28",
@@ -305,6 +335,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "steph123456",
         154309,
         "5f8854dd231a302c643b22521b49ed3007203d74b8b8413a23abc79ffe0b0270",
+        "jpeg",
     ),
     (
         "song_sparrow-29",
@@ -314,6 +345,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "terrimewbornagain",
         81046,
         "2020092b0b67397a78cc2b0df267fb671b3ba18e03fb0e35e664e0784061e3c6",
+        "jpeg",
     ),
     (
         "chipping_sparrow-00",
@@ -323,6 +355,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "k-simpkins",
         62563,
         "cf9f3b0c1863808e21af596b2e609b047ddbc28cb2ed076625e2546425ff0adf",
+        "jpg",
     ),
     (
         "chipping_sparrow-01",
@@ -332,6 +365,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "w_mark_c",
         193389,
         "497d0a0fef81c326bcc87b5d1eb97fe987d559b8f2b71bb60fe422ae34dce150",
+        "jpg",
     ),
     (
         "chipping_sparrow-02",
@@ -341,6 +375,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "ellyne",
         142332,
         "6a60ebac34476a372b4790a87d823432cdda8f72590930b5d18ae166cf4c7ba2",
+        "jpeg",
     ),
     (
         "chipping_sparrow-03",
@@ -350,6 +385,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "reuvenm",
         70532,
         "5ad36c9cdd6c92e225a1b8ab3c04d2f65bc4e971d0243958f8ac090b0996115c",
+        "jpeg",
     ),
     (
         "chipping_sparrow-04",
@@ -359,6 +395,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "carterdorscht",
         208567,
         "c974a676c3c227c2844ff822d429c784bc87bb41f40d5074a0ebadd4c6785b21",
+        "jpeg",
     ),
     (
         "chipping_sparrow-05",
@@ -368,6 +405,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "rawcomposition",
         46329,
         "41c9260ca9107430e3a8090ba01cebf3e3c25f2dad15bea4f77c8e824d9fc496",
+        "jpg",
     ),
     (
         "chipping_sparrow-06",
@@ -377,6 +415,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "andywilson",
         156894,
         "b70edd35e00fe672a39d5f0441ea4e9bb9fac19b0f2415ae13e22160bc6091a6",
+        "jpeg",
     ),
     (
         "chipping_sparrow-07",
@@ -386,6 +425,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "davidfbird",
         145714,
         "ea65ce5ed881ded9a8157b5756fa907948f41e0eefb6735b48a1c43993e977f9",
+        "jpeg",
     ),
     (
         "chipping_sparrow-08",
@@ -395,6 +435,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "rwp84",
         47983,
         "41eac0a5fb578b089f7524c4d2e6cb38c5508aa81815d6cfc46948c081daa800",
+        "jpg",
     ),
     (
         "chipping_sparrow-09",
@@ -404,6 +445,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "tim_kirsten",
         64812,
         "cbb2a03f5dbd2209d56f1cca8b49f342dfbaf44e51fe1014ead75b2018c6678d",
+        "jpeg",
     ),
     (
         "chipping_sparrow-10",
@@ -413,6 +455,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "russnamitz",
         61359,
         "8200cc2ec779d47be1b5afa261d934910a251a39f5620d3dc705106fb2bf5e0b",
+        "jpeg",
     ),
     (
         "chipping_sparrow-11",
@@ -422,6 +465,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "gcart043",
         129377,
         "1bdce32e7ac58321dd6beacc084afaf45973469215d66b61a0f7c612da3db361",
+        "jpeg",
     ),
     (
         "chipping_sparrow-12",
@@ -431,6 +475,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "tniernberger",
         78380,
         "44ddb9923026a97ee77ed362bc944c3d2cbbe4fbd4636000880e81613634e6c5",
+        "jpg",
     ),
     (
         "chipping_sparrow-13",
@@ -440,6 +485,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "matthias55",
         81986,
         "7a9a5cbfb6a7d0581c98c75b5fdeb53a049d60f352eda43a39b1f9c2a3347f3b",
+        "jpeg",
     ),
     (
         "chipping_sparrow-14",
@@ -449,6 +495,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "bradenjudson",
         22352,
         "7c630d7a5b24d94e677e563a8ecb36f57fb29babe6ac1568f11537f10a5edf75",
+        "jpeg",
     ),
     (
         "chipping_sparrow-15",
@@ -458,6 +505,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "radrat",
         55646,
         "0c71ca735502e8c94db81302ecd006428206eb16d75472eb0c706e62e2656667",
+        "jpg",
     ),
     (
         "chipping_sparrow-16",
@@ -467,6 +515,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "hiltonward",
         201271,
         "2a6479556f14a20a8c9a69ff0c1026fe4deb376944234d1d4429c558042c4346",
+        "jpg",
     ),
     (
         "chipping_sparrow-17",
@@ -476,6 +525,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "craigmartin",
         101736,
         "feb94d319fe5b12c01e63a80dc8e44c45e15a0bfb6534ac5d2c0641205dfe1d5",
+        "jpg",
     ),
     (
         "chipping_sparrow-18",
@@ -485,6 +535,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "laurelthrone",
         194107,
         "13e7336628f9ad784757dca82557c79eda22fdce561e0b52a10a503e72979b8e",
+        "jpeg",
     ),
     (
         "chipping_sparrow-19",
@@ -494,6 +545,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "enspring",
         85687,
         "886b7e6faa39943f0c9754e4aef637e2a2f5ad57fe8e8c7ec08360ea95af45b1",
+        "jpeg",
     ),
     (
         "chipping_sparrow-20",
@@ -503,6 +555,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "bunnymom20",
         188328,
         "2f6b6f7ac5ed9d91a361c8fed102484f4fca599ec39c9a2bfe9af1df53b28899",
+        "jpeg",
     ),
     (
         "chipping_sparrow-21",
@@ -512,6 +565,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "andy71",
         350329,
         "d649c3c9fd6b0b159a979572b48daba39fc5608104f21c6d88c7d10fa2479f7e",
+        "jpg",
     ),
     (
         "chipping_sparrow-22",
@@ -521,6 +575,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "cvharris",
         144339,
         "d1ab8643c48f2ea823f9b61843016795def21b290c35ce3d6045e4933b5dfa0a",
+        "jpeg",
     ),
     (
         "chipping_sparrow-23",
@@ -530,6 +585,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "mrspteranodon",
         232126,
         "dd60e466086350ce1b9f7a9ba7784fc3963b3f996326ccf52f5adffa5719c39d",
+        "jpeg",
     ),
     (
         "chipping_sparrow-24",
@@ -539,6 +595,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "umamimomma",
         52983,
         "a8948a0189d19b3d7b8df65271f4844b14bd5118f510d0b9ef458c942ac41ce2",
+        "jpg",
     ),
     (
         "chipping_sparrow-25",
@@ -548,6 +605,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "wafflemaster135",
         58919,
         "2ba9557d06a7f1bcb1c20908efc82ea6317e5a0bd0c858898f3b5c0a007d20fb",
+        "jpeg",
     ),
     (
         "chipping_sparrow-26",
@@ -557,6 +615,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "aster-asti",
         105786,
         "82c35e04e4e22fe35c9b364bce7737fa5226cb5c469c761adfc61ef0956da9db",
+        "jpg",
     ),
     (
         "chipping_sparrow-27",
@@ -566,6 +625,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "perrydise_koisplash",
         171532,
         "35c6469fad62f198c060e056bd298f87976b39055cf66601a265ab55d5562642",
+        "jpeg",
     ),
     (
         "chipping_sparrow-28",
@@ -575,6 +635,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "ian-wolfe",
         181942,
         "cfab51f0c0598120f5312b354ae249bafb15124dd74723a8c29cdd7319206e49",
+        "jpg",
     ),
     (
         "chipping_sparrow-29",
@@ -584,6 +645,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "sooji",
         200440,
         "04fd7d05d5ced3073d4c7ce8a4f659c6994bb485c5253b26fbc471452b4a0b14",
+        "jpeg",
     ),
     (
         "white_throated_sparrow-00",
@@ -593,6 +655,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "rawcomposition",
         31152,
         "d1c08bfaca721bf0873437455b4cc010c6860d08b4777136c775007b0b9d07b6",
+        "jpg",
     ),
     (
         "white_throated_sparrow-01",
@@ -602,6 +665,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "dziakj1",
         125954,
         "c595a41fbc8948b0d918b59117340dc320e2ba80d29e92bb9dacaaed5b404852",
+        "jpeg",
     ),
     (
         "white_throated_sparrow-02",
@@ -611,6 +675,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "joy4birds",
         111767,
         "7ce091492c73c68395667bb45578dfff11457511b0958d1d0d320d1df3e55ceb",
+        "jpg",
     ),
     (
         "white_throated_sparrow-03",
@@ -620,6 +685,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "bradenjudson",
         23399,
         "e103968e2a6c9efb6f0bcb548a6457aef950a4a720838a624b6796b90411538e",
+        "jpeg",
     ),
     (
         "white_throated_sparrow-04",
@@ -629,6 +695,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "andywilson",
         29827,
         "65475d4842396f2488167453192d4aa834d2f1b40bcc78b420878c55ccf694d7",
+        "jpeg",
     ),
     (
         "white_throated_sparrow-05",
@@ -638,6 +705,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "lavenderdame",
         106872,
         "36379abf3af51d865ba6e6804ba3dd48fc9efd12ecc0b7d97e03fc04a16178a8",
+        "jpg",
     ),
     (
         "white_throated_sparrow-06",
@@ -647,6 +715,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "allan7",
         42443,
         "10791891945e83a0c908c14fea07a257a0f25f51c0e708bee35184213833a635",
+        "jpeg",
     ),
     (
         "white_throated_sparrow-07",
@@ -656,6 +725,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "stevestevens",
         138735,
         "bd52e6d2f48c247f72db0fa393ec4fa13af8510c95f0ca9134cbef71caddb6d4",
+        "jpeg",
     ),
     (
         "white_throated_sparrow-08",
@@ -665,6 +735,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "schylerbrown",
         31467,
         "6496e7e6d3abf13b1a538f769e3cc402280cf1e9a2a1ebdf81c68dcfd7ed01e2",
+        "jpeg",
     ),
     (
         "white_throated_sparrow-09",
@@ -674,6 +745,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "w_mark_c",
         251287,
         "3828c41af9209b408fe0d8ec6541edf35d13fc730b74fd27a82980d4f3771137",
+        "jpg",
     ),
     (
         "white_throated_sparrow-10",
@@ -683,6 +755,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "deejay",
         75694,
         "d67efb1ec61f6700b8a6c6552e2da9cd981e68ae81af16d6f1e0ef17fcaff84f",
+        "jpeg",
     ),
     (
         "white_throated_sparrow-11",
@@ -692,6 +765,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "wildreturn",
         128989,
         "7ed4bde480b35734576bb4c5f9d1453e77c1f095380432b43b1b682050255831",
+        "jpeg",
     ),
     (
         "white_throated_sparrow-12",
@@ -701,6 +775,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "ethologist",
         149260,
         "3e2710fac082cc347e6cd114d42d39f25ec47b82c25936922232eba916808cdb",
+        "jpg",
     ),
     (
         "white_throated_sparrow-13",
@@ -710,6 +785,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "laurelthrone",
         148616,
         "0cac1bc7053c891ce5ae1c33e3f94b69f1b19b958bd08c686db2ccaa7ba0fbd1",
+        "jpeg",
     ),
     (
         "white_throated_sparrow-14",
@@ -719,6 +795,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "efalquet",
         119214,
         "c3db4583124472b28dbfb4c6fd9b3829e451d508a6b0a095eccc28f17e7982b4",
+        "jpeg",
     ),
     (
         "white_throated_sparrow-15",
@@ -728,6 +805,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "ian-wolfe",
         73751,
         "e28974c8782fccb00f5ea5420140e01248ead859f151563a95a26bf67acba479",
+        "jpg",
     ),
     (
         "white_throated_sparrow-16",
@@ -737,6 +815,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "dinomariobob",
         167744,
         "cc5e25afa5041ce2d6ea4e0d726793843f3a867f30b8d9ccf55892d6617da887",
+        "jpg",
     ),
     (
         "white_throated_sparrow-17",
@@ -746,6 +825,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "suzannehale",
         141857,
         "4a354c189225de2e7b4e94a6df9cbd3a671dac0c8a7d2d4c75e933f93d8b83bf",
+        "jpeg",
     ),
     (
         "white_throated_sparrow-18",
@@ -755,6 +835,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "kemper",
         97802,
         "4de7da3ac53a086f2c343555be5a2b62a683715db9f80636a76673cc380fa7f6",
+        "jpeg",
     ),
     (
         "white_throated_sparrow-19",
@@ -764,6 +845,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "k-simpkins",
         90416,
         "af2b4e72a098bd90b920c8a49632e1bbff18b73954d8ac541ca81ed4baf0530b",
+        "jpg",
     ),
     (
         "white_throated_sparrow-20",
@@ -773,6 +855,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "don54",
         62714,
         "7f6eea434fc700166af1d343951d15f3a9c83eff06cfb0518c3c4291019a5556",
+        "jpeg",
     ),
     (
         "white_throated_sparrow-21",
@@ -782,6 +865,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "rrfc",
         45842,
         "f7c6394649765db6e3313a03ae013291db1ae20d89d3b8f0bdf6641757f31ed0",
+        "jpg",
     ),
     (
         "white_throated_sparrow-22",
@@ -791,6 +875,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "ianrwhyte",
         141502,
         "b0633999572a4499a80310955ab928a86f4fe08774e669b4c4949cd26254428b",
+        "jpeg",
     ),
     (
         "white_throated_sparrow-23",
@@ -800,6 +885,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "portablecity",
         370187,
         "11e3a97f43de5d61266d15028fe9023eef3900cfea2d027bd94ad847ecba9607",
+        "jpg",
     ),
     (
         "white_throated_sparrow-24",
@@ -809,6 +895,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "memoosborne",
         120656,
         "82684f82f62f6e036e206eec315fff8e1ba36d308b667eba06750b75d1fada3a",
+        "jpg",
     ),
     (
         "white_throated_sparrow-25",
@@ -818,6 +905,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "russnamitz",
         58449,
         "2a7d2b4226f1941d0950adc04bfd8fe62345f1138c521d0f5f0adf8bc5838da1",
+        "jpg",
     ),
     (
         "white_throated_sparrow-26",
@@ -827,6 +915,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "jd_flores",
         121343,
         "5eeef4f5533a4b0a0222dcf7be000a2b34f3331f3be2b939703155ba8c8ba3ae",
+        "jpg",
     ),
     (
         "white_throated_sparrow-27",
@@ -836,6 +925,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "toknowtheland",
         144197,
         "20a4933b00967fe4488296b2b6e89c12ecbcca0e40da591bd95927cca46ae2f7",
+        "jpg",
     ),
     (
         "white_throated_sparrow-28",
@@ -845,6 +935,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "sturuss",
         117077,
         "d309f75ad5f4008c906ba7b3d6138aa017f919a0a17a1d5b431fa7ab47d5f2d3",
+        "jpg",
     ),
     (
         "white_throated_sparrow-29",
@@ -854,6 +945,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "carterdorscht",
         122157,
         "f1fb32bcfb78f66f50ccd20f2418832afe72c7a5847bdeb8e4dc19546455cfaf",
+        "jpeg",
     ),
     (
         "dark_eyed_junco-00",
@@ -863,6 +955,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "schylerbrown",
         182973,
         "185209c7a1111fc626a068e136ec3cfcdff3174d15f1c60af209d7b32fe7bef9",
+        "jpeg",
     ),
     (
         "dark_eyed_junco-01",
@@ -872,6 +965,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "haida_gwaii",
         46823,
         "a92dca21e6e58c375fc313f0d1da2c86c11408beb0df8fd96fc60ae035ae80d5",
+        "jpg",
     ),
     (
         "dark_eyed_junco-02",
@@ -881,6 +975,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "ben142",
         289608,
         "7bf320edf4d34a4848f3e9d175cfafa66cc5bab6a1a8f97c41c670263de3ff89",
+        "jpg",
     ),
     (
         "dark_eyed_junco-03",
@@ -890,6 +985,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "k-simpkins",
         172398,
         "206f012add8a5d0fa434e07c51f1e7bd73a60c4d299a2202163fc662e1b03479",
+        "jpeg",
     ),
     (
         "dark_eyed_junco-04",
@@ -899,6 +995,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "truthseqr",
         45302,
         "f8241eab39797c4e097a1432b13658466287d61ed515448457907c17e60cf5e2",
+        "jpeg",
     ),
     (
         "dark_eyed_junco-05",
@@ -908,6 +1005,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "zacharyfoster",
         46712,
         "ea8f9f0eebb4d2f86193c705344a8fab09bf634bc2217a0874ee57c4f0f5b4ab",
+        "jpg",
     ),
     (
         "dark_eyed_junco-06",
@@ -917,6 +1015,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "andy71",
         51209,
         "c54b45ca7fdc635bdb31eb89166c9fce84f0b0f8f0c17331fd5e42b582633c9b",
+        "jpeg",
     ),
     (
         "dark_eyed_junco-07",
@@ -926,6 +1025,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "andywilson",
         71321,
         "ee5308b6f93fb40a6d795a7d8ca6f2ef55b4844513f4268ef34827e1c5e4c4a6",
+        "jpeg",
     ),
     (
         "dark_eyed_junco-08",
@@ -935,6 +1035,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "nathanael15",
         57646,
         "d6b9e7d2dcc63cdd88b47cce328149aa9e8eb486ee2a5fc0f08b90601f2c7d9b",
+        "jpg",
     ),
     (
         "dark_eyed_junco-09",
@@ -944,6 +1045,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "chrisleearm",
         41870,
         "90573e814dbde965c70a934d9702110c40670aa22cc9f80ff8849db877d1fd72",
+        "jpeg",
     ),
     (
         "dark_eyed_junco-10",
@@ -953,6 +1055,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "joy4birds",
         90973,
         "fd25ecb1bf86896b84e9e4e8329c742011011e6883631f47dbe3744ba7463153",
+        "jpg",
     ),
     (
         "dark_eyed_junco-11",
@@ -962,6 +1065,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "gambolingquail",
         93957,
         "a454d6f987153317c9c57c05019b08ab0ebebc46d3cf72356b014231b69a1e9d",
+        "jpeg",
     ),
     (
         "dark_eyed_junco-12",
@@ -971,6 +1075,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "jan-konilu",
         110145,
         "d18706f536164a72a4ec9bacf47437edd89d6b547f86eefdf10ed0166cebf0dd",
+        "jpeg",
     ),
     (
         "dark_eyed_junco-13",
@@ -980,6 +1085,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "thevertebratepokedex",
         141252,
         "854f75e7527932d0409e14756725388de9913c0b450536da717e54d683de169f",
+        "jpg",
     ),
     (
         "dark_eyed_junco-14",
@@ -989,6 +1095,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "orionid",
         108583,
         "7eab4cea6d46faa878732d82c5c2ece63ecc3e66781ea08d0bd950eee581d16d",
+        "jpg",
     ),
     (
         "dark_eyed_junco-15",
@@ -998,6 +1105,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "bobbyblackmore",
         82853,
         "87746be0bca30fc40ddba739c1a35ed1fdd41882ebfe3561518b69d285f5ae5d",
+        "jpeg",
     ),
     (
         "dark_eyed_junco-16",
@@ -1007,6 +1115,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "artemis224",
         216253,
         "15198c123c01fa0f8c03edc086408c8d95ffa553083c380e8ae236dbb7056093",
+        "jpg",
     ),
     (
         "dark_eyed_junco-17",
@@ -1016,6 +1125,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "braincellsgone",
         40857,
         "be34c51655f59612858d888b05a4f927da65e1aede850c9a5f1be68fa00bfcbe",
+        "jpg",
     ),
     (
         "dark_eyed_junco-18",
@@ -1025,6 +1135,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "igor322",
         86925,
         "9339b8cf4aa347b4eb176ef1209dfaa4fcb11e277889cc17de399d6af2c8633a",
+        "jpeg",
     ),
     (
         "dark_eyed_junco-19",
@@ -1034,6 +1145,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "vicki936",
         41475,
         "e6903e9a69e987c45edd468ace0bf71adf8252063ff5d39c2130409d8fea68be",
+        "jpeg",
     ),
     (
         "dark_eyed_junco-20",
@@ -1043,6 +1155,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "skylar_schell",
         15425,
         "7e876479febb3d44b1e494a25f778efe4e8bfd323279031cb08f9f6fe95f742e",
+        "jpg",
     ),
     (
         "dark_eyed_junco-21",
@@ -1052,6 +1165,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "toknowtheland",
         106373,
         "07770f3313dc969802355fa8b3e62a86edb115a64771bd38938e1fab33220c39",
+        "jpg",
     ),
     (
         "dark_eyed_junco-22",
@@ -1061,6 +1175,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "shannon_j",
         74167,
         "ec4c7ce15aa1c4eadd3bc5d46d433baf9560d6a0e4593d8d57aab8fa9bec9e18",
+        "jpg",
     ),
     (
         "dark_eyed_junco-23",
@@ -1070,6 +1185,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "w_mark_c",
         262126,
         "5025e757c026e02160ff3f0e82f1f4434b888a6c9689e7ac76274c1fcec64f0c",
+        "jpg",
     ),
     (
         "dark_eyed_junco-24",
@@ -1079,6 +1195,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "aschuman",
         59459,
         "89dd933d12cf21c0e73eb01e96a9279e2e57b36676a72a9c860281d0d7703282",
+        "jpg",
     ),
     (
         "dark_eyed_junco-25",
@@ -1088,6 +1205,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "dougbrown",
         56324,
         "70275d8e07192c99e121b67d206de6823b194f043e65b9766f1f9ce772953c78",
+        "jpeg",
     ),
     (
         "dark_eyed_junco-26",
@@ -1097,6 +1215,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "jeffreyleeisanaturalist",
         108394,
         "0f667e9af8e8d3585807da58a2f315c5dbcb7eece5f6862006fb9da68a4bef42",
+        "jpg",
     ),
     (
         "dark_eyed_junco-27",
@@ -1106,6 +1225,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "eug302",
         106520,
         "394abfbcf192ecf5a76cb2f19dfa2a62070fa3874b084d1468219d6ee5db6cbf",
+        "jpeg",
     ),
     (
         "dark_eyed_junco-28",
@@ -1115,6 +1235,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "rawcomposition",
         32258,
         "73fad57ed975df01c529e77eaca9eab9b00741ea2cfc91358856aefca620a10a",
+        "jpg",
     ),
     (
         "dark_eyed_junco-29",
@@ -1124,6 +1245,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "glmory",
         108168,
         "d31767f42eaaf7f3527133fffb9a0271a9dbbe66fc036d5c694b605563d09965",
+        "jpg",
     ),
     (
         "house_finch-00",
@@ -1133,6 +1255,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "kristen163",
         75945,
         "eeafad0dd2e91ecfe45c9d1f27dd0392a01bd81099549c60fd2e36a4b4342a9f",
+        "jpeg",
     ),
     (
         "house_finch-01",
@@ -1142,6 +1265,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "aster-asti",
         82128,
         "a8848197b4e7890e07538d492480c4275b75d04e10c1ae95aee91aaafe3319c5",
+        "jpg",
     ),
     (
         "house_finch-02",
@@ -1151,6 +1275,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "vicki936",
         22211,
         "c377fb361df0324c7a856d9344968886ece3b94bd67188c9325b8d2d284d3a2f",
+        "jpeg",
     ),
     (
         "house_finch-03",
@@ -1160,6 +1285,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "ben142",
         196735,
         "a89f8e0263fdabb404b462acaa592f5dd2ac88ee4615da444470de4a1fae82d5",
+        "jpg",
     ),
     (
         "house_finch-04",
@@ -1169,6 +1295,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "henrya",
         61724,
         "1b96d37a7078e1b725b80af4b10848da58b0d0c17a70c8ac01e326c0a749ee6b",
+        "jpeg",
     ),
     (
         "house_finch-05",
@@ -1178,6 +1305,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "enspring",
         46784,
         "8b355426d8fe6327f202c6a9458cee1b95de445bfbf7e48a4b5a2c7d0eb78a8c",
+        "jpg",
     ),
     (
         "house_finch-06",
@@ -1187,6 +1315,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "leahmfulton",
         44269,
         "6d6202de26f042d83ee6c5af550cd74e6ab10eb796eed2f78c83ac9e2368e4b7",
+        "jpg",
     ),
     (
         "house_finch-07",
@@ -1196,6 +1325,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "truthseqr",
         149455,
         "abb84d1e327dd82c07cbea3dd5583c07453e69b2cc220397b101e597da81bd6c",
+        "jpg",
     ),
     (
         "house_finch-08",
@@ -1205,6 +1335,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "hamiltonturner",
         124116,
         "6b7687640c4641b974865da04cf9eaf1f86b774ebc19678f2fc39e55c8648930",
+        "jpeg",
     ),
     (
         "house_finch-09",
@@ -1214,6 +1345,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "jnicat",
         25823,
         "e1e3baff8d0bd72339e3e49089f7f4f2c1dd383ff005e49a964a1bacc4f8ebb8",
+        "jpeg",
     ),
     (
         "house_finch-10",
@@ -1223,6 +1355,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "pbaff",
         149626,
         "2684cfb1fc40d7766610a5920ead0ad0c27c338ccb4fb9ed18baddda150568b0",
+        "jpeg",
     ),
     (
         "house_finch-11",
@@ -1232,6 +1365,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "stevestevens",
         120325,
         "5d1e8c097c214d14ef7b895bf95769ae9bc25fa799a98bbfa6f12f2f84e6af79",
+        "jpeg",
     ),
     (
         "house_finch-12",
@@ -1241,6 +1375,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "kcthetc1",
         52329,
         "b9929163e4fdadef26c753437ac7af3ad550aa047b15cba131c05d4d335799fe",
+        "jpeg",
     ),
     (
         "house_finch-13",
@@ -1250,6 +1385,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "verdantpulsar",
         101003,
         "90fe37c477bad9ed30ab119e1a7445ffc2720e548a22bb65d66b2ff7b82337d5",
+        "jpeg",
     ),
     (
         "house_finch-14",
@@ -1259,6 +1395,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "kgarrett",
         56801,
         "ce03d1d70a89b5e6e0088f4307f8077573c3571b91997725ca2e6c69be80e2d0",
+        "jpeg",
     ),
     (
         "house_finch-15",
@@ -1268,6 +1405,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "rlaortiz",
         149985,
         "cf007ef8ac57bc0eb085c9eecf9fc95eb69a29df706998de237df24f9491c61d",
+        "jpeg",
     ),
     (
         "house_finch-16",
@@ -1277,6 +1415,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "damienxw",
         104277,
         "56d3656be473c362f1ccd09d15e62cbcfe9137d83bef7a3312d72444921c7805",
+        "jpg",
     ),
     (
         "house_finch-17",
@@ -1286,6 +1425,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "dinomariobob",
         74972,
         "5f6121c1f8dbfaccbb61c279a579c22600744eb4118c2eeef09e69c86f6e1a49",
+        "jpg",
     ),
     (
         "house_finch-18",
@@ -1295,6 +1435,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "k-simpkins",
         86922,
         "209a884cf7618d0b85679ae3a72f237a6d03a5a3096f6ab1b2e5503c38c50d9d",
+        "jpg",
     ),
     (
         "house_finch-19",
@@ -1304,6 +1445,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "aparrot1",
         79152,
         "115302ef807e6f4d132df584a20ba8644846f05dfe9fee27a7c0e07ec89d87b7",
+        "jpg",
     ),
     (
         "house_finch-20",
@@ -1313,6 +1455,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "vijaybarve",
         115757,
         "15538eeeb228d284f49f33d0bda77626b57fdaabe90d05f4379ffc3bbd855703",
+        "jpeg",
     ),
     (
         "house_finch-21",
@@ -1322,6 +1465,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "dougbrown",
         29723,
         "d7fea293bd3f92aec7be52bdfe5b904793c53cfaeacf9ffd2e762702ee10ba74",
+        "jpeg",
     ),
     (
         "house_finch-22",
@@ -1331,6 +1475,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "matthias55",
         87579,
         "62adc5d86cbdb613779fefa84f6f74f306b6fab5bfb86320f4ef40cd2571ff6a",
+        "jpeg",
     ),
     (
         "house_finch-23",
@@ -1340,6 +1485,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "nana10",
         123890,
         "10b3b6c0b4273a31597050df4218899ddcbe31cdfa60d9a46421ed0bf3d26558",
+        "jpeg",
     ),
     (
         "house_finch-24",
@@ -1349,6 +1495,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "kerykeion",
         91321,
         "6166a9bf59e2075a1129b344a24f3fcafccb610eb984510c5b4c3f9b3abe96af",
+        "jpeg",
     ),
     (
         "house_finch-25",
@@ -1358,6 +1505,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "cathartic_cathartes",
         55197,
         "1929f770ec5ca766c6b88ffdbad5fd7c27df033e12fe46109fd87dc1c835fc59",
+        "jpeg",
     ),
     (
         "house_finch-26",
@@ -1367,6 +1515,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "michelle_lopez",
         51377,
         "9422e42758a68c343d0487d07726819424a24c8271a94aa48c75f4c1e339be77",
+        "jpg",
     ),
     (
         "house_finch-27",
@@ -1376,6 +1525,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "c_dizzy",
         145810,
         "ae7289dc681f8e192886d47018ee70aa9586f08e618e57fa1fe195a5695e1779",
+        "jpeg",
     ),
     (
         "house_finch-28",
@@ -1385,6 +1535,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "chrisleearm",
         102901,
         "b6bd72b41f04d2b6a7855b28e2b169d5aad6663db4a0ac0d364b22ffc2512018",
+        "jpg",
     ),
     (
         "house_finch-29",
@@ -1394,6 +1545,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "kemper",
         103151,
         "62ee726242d1970d9bb8536e31c06635afc92b9352d1394574acb1d9d5eb26ed",
+        "jpeg",
     ),
     (
         "american_goldfinch-00",
@@ -1403,6 +1555,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "glennberry",
         59673,
         "72d36079e592e0a83c2f774f9073bfd4cc81253452c925d1673217ddd4b52a36",
+        "jpeg",
     ),
     (
         "american_goldfinch-01",
@@ -1412,6 +1565,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "braincellsgone",
         55661,
         "6344e0125e74791f43ac6e07e5e1b9fbfce6d19bc62b6bb5d83b3caff9f7bcbc",
+        "jpg",
     ),
     (
         "american_goldfinch-02",
@@ -1421,6 +1575,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "radrat",
         98990,
         "232a944f7e3351d4916a12ef2f6d598e7b007caaa95a9b064a14c1ba3af2a6ff",
+        "jpeg",
     ),
     (
         "american_goldfinch-03",
@@ -1430,6 +1585,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "eug302",
         44231,
         "11c723482cc75fcc3a723ac1c0818a68e2fcf74c4ca684cf60195bf0d33f274e",
+        "jpg",
     ),
     (
         "american_goldfinch-04",
@@ -1439,6 +1595,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "mefisher",
         154503,
         "66f07bc59bb3fdedd65a4537ebabd0cafd457826b8bf4bb633181f584a3edfd1",
+        "jpg",
     ),
     (
         "american_goldfinch-05",
@@ -1448,6 +1605,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "k-simpkins",
         45413,
         "d76e7adf33e3a84ebec24dde5438965e62ebec8595755453973846340e4f460d",
+        "jpg",
     ),
     (
         "american_goldfinch-06",
@@ -1457,6 +1615,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "nathan1177",
         66516,
         "7ad75838fdf2020a8e426e97507c7dd4355da93e6eece241128c28adbe302438",
+        "jpg",
     ),
     (
         "american_goldfinch-07",
@@ -1466,6 +1625,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "enspring",
         42886,
         "78aebfb9b28c3e16dd9618a0e1ae06df67bfa4b8550c0879427d96915c475fed",
+        "jpeg",
     ),
     (
         "american_goldfinch-08",
@@ -1475,6 +1635,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "ben142",
         270599,
         "733d64cd50c61334682f0862f5c7859ded34cae5776ee0bc6594fee400dc4876",
+        "jpg",
     ),
     (
         "american_goldfinch-09",
@@ -1484,6 +1645,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "dande",
         163470,
         "39e7892e81eeef6af4887e61bc0998e17797688eb6394fcc8c9438391e875ee0",
+        "jpeg",
     ),
     (
         "american_goldfinch-10",
@@ -1493,6 +1655,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "memoosborne",
         129438,
         "ef4a9a771cef9ba3c2c047eb106a6aa220236dd6aaa6aade5f4ef3a37c8abcba",
+        "jpeg",
     ),
     (
         "american_goldfinch-11",
@@ -1502,6 +1665,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "drew_baxter",
         106009,
         "74e34c776f1b9a5d375a7dfae0e309cd42dbd133b82a1ecad4a49111ac7eed49",
+        "jpeg",
     ),
     (
         "american_goldfinch-12",
@@ -1511,6 +1675,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "vicki936",
         255397,
         "3326ddbee3270241b681cb636466e742491f110e9841f453f5158864aadaea36",
+        "jpg",
     ),
     (
         "american_goldfinch-13",
@@ -1520,6 +1685,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "hickl",
         24740,
         "0c295b3761bced4215519ff24a4f734773b54be98de456a4444d0819456af7dd",
+        "jpeg",
     ),
     (
         "american_goldfinch-14",
@@ -1529,6 +1695,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "joy4birds",
         81109,
         "357014c108519543471b94f39591667d1a67d87fd1fdc4702a3a449235d6bddd",
+        "jpeg",
     ),
     (
         "american_goldfinch-15",
@@ -1538,6 +1705,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "dctphoto",
         178111,
         "17b2f3599e20161acc17fd63bf61e9f40488b9c4d5bfaefc8cae54de42997509",
+        "jpeg",
     ),
     (
         "american_goldfinch-16",
@@ -1547,6 +1715,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "megachile",
         49358,
         "6bbc6ca0ac074e486c20ce4c3fad5dc863cb2e908efc2b1ef97494403a351252",
+        "jpeg",
     ),
     (
         "american_goldfinch-17",
@@ -1556,6 +1725,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "raffib128",
         128110,
         "863c76587fe1de80a84b97c2e72f38ae1cf4fa972789e006d9b0b544d696c6ef",
+        "jpeg",
     ),
     (
         "american_goldfinch-18",
@@ -1565,6 +1735,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "nathanael15",
         74086,
         "7059ae3bdeeb48fe949e5b70b788bd28c96aecd0fe49cb7be22db9a8697bf5a5",
+        "jpg",
     ),
     (
         "american_goldfinch-19",
@@ -1574,6 +1745,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "akneidel",
         26423,
         "4af74c1d04ddc7bbb7bb0e9eb2977a1daf48dd9b9477d71d69a7c4cb5d4f785b",
+        "jpg",
     ),
     (
         "american_goldfinch-20",
@@ -1583,6 +1755,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "wildreturn",
         68204,
         "565d2a3b6d404e9ea0c24737ebcc5a3a82057b1452b4790df5e9552e8c50e592",
+        "jpg",
     ),
     (
         "american_goldfinch-21",
@@ -1592,6 +1765,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "conhawn",
         84915,
         "69f768c39a2180440bdcbfc6addc5d426341e8080d4cf9ba8241d57564b3e6fb",
+        "jpg",
     ),
     (
         "american_goldfinch-22",
@@ -1601,6 +1775,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "dinomariobob",
         142312,
         "01c63d305fce8edcc3a494f0543154c6bd6aa52368e02be84cf6c23e95b94cdd",
+        "jpg",
     ),
     (
         "american_goldfinch-23",
@@ -1610,6 +1785,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "eric112",
         60314,
         "0db1b5f0e32d1faf861a437a20794fa18e80ea8966313933c145451c9319e2a9",
+        "jpg",
     ),
     (
         "american_goldfinch-24",
@@ -1619,6 +1795,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "bradenjudson",
         23468,
         "827d77bf9ca9cc456e867434a07b68cdceb4a20e09eb9e6b67757c80cd31ff42",
+        "jpeg",
     ),
     (
         "american_goldfinch-25",
@@ -1628,6 +1805,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "artemis224",
         217909,
         "99e1d7d30eb19d47c7974e9ddd7efe4d06329c952a41e15d0a4b2095b747df61",
+        "jpg",
     ),
     (
         "american_goldfinch-26",
@@ -1637,6 +1815,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "reuvenm",
         58833,
         "90f0b687d9626fdf5d0111b794cf960cf18f3de4c8eab601fcb23c41b45c4df7",
+        "jpeg",
     ),
     (
         "american_goldfinch-27",
@@ -1646,6 +1825,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "umamimomma",
         78717,
         "fae2edcb0901dada461a9ac6b3873d6479e8faf66bfd26a0ad47021f6bcff704",
+        "jpg",
     ),
     (
         "american_goldfinch-28",
@@ -1655,6 +1835,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "rachel_bosley",
         131792,
         "864be3aebb7f1c8c9ed01cdf2e16b690f11354bb37e53b23d44671082afdbcfc",
+        "jpg",
     ),
     (
         "american_goldfinch-29",
@@ -1664,6 +1845,7 @@ SAMPLE_RECORDS: tuple[tuple[str, str, int, int, str, int, str], ...] = (
         "carterdorscht",
         149077,
         "a8360d1774df42f034692863781af47fd030265df9bcc1fc938333fabc673c9e",
+        "jpeg",
     ),
 )
 SAMPLE_SEED = 42
@@ -1681,8 +1863,11 @@ def _sha256_bytes(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
-def photo_url(photo_id: int) -> str:
-    return f"{CORPUS_BASE_URL}{photo_id}/medium.jpg"
+def photo_url(photo_id: int, ext: str = "jpg") -> str:
+    """The served object for a pinned photo; `ext` is its recorded original extension (jpg or jpeg)."""
+    if ext not in ("jpg", "jpeg"):
+        raise ValueError(f"unsupported photo extension {ext!r}")
+    return f"{CORPUS_BASE_URL}{photo_id}/medium.{ext}"
 
 
 def observation_url(observation_id: int) -> str:
@@ -1694,11 +1879,11 @@ def fetch_corpus(*, cache_dir: str | Path | None = None, fetcher: Any = None) ->
     cache = Path(cache_dir) if cache_dir is not None else DEFAULT_CACHE_DIR
     cache.mkdir(parents=True, exist_ok=True)
     out = {}
-    for rid, _label, photo_id, _obs, _user, size, digest in SAMPLE_RECORDS:
+    for rid, _label, photo_id, _obs, _user, size, digest, ext in SAMPLE_RECORDS:
         local = cache / f"{photo_id}.jpg"
         data = local.read_bytes() if local.is_file() else b""
         if len(data) != size or _sha256_bytes(data) != digest:
-            url = photo_url(photo_id)
+            url = photo_url(photo_id, ext)
             if fetcher is not None:
                 data = fetcher(url)
             else:
@@ -1707,7 +1892,7 @@ def fetch_corpus(*, cache_dir: str | Path | None = None, fetcher: Any = None) ->
                     data = response.read()
             if len(data) != size or _sha256_bytes(data) != digest:
                 raise ValueError(
-                    f"{rid} ({photo_id}/medium.jpg): fetched {len(data)} bytes with sha256 "
+                    f"{rid} ({photo_id}/medium.{ext}): fetched {len(data)} bytes with sha256 "
                     f"{_sha256_bytes(data)[:16]}…, pinned {size} / {digest[:16]}…"
                 )
             local.write_bytes(data)
@@ -1718,7 +1903,7 @@ def fetch_corpus(*, cache_dir: str | Path | None = None, fetcher: Any = None) ->
 def read_corpus(files: Mapping[str, bytes]) -> list[dict[str, Any]]:
     """Decode the verified photo bytes into `{id, image, label}` records with their provenance."""
     out = []
-    for rid, label, photo_id, obs_id, user, _size, _digest in SAMPLE_RECORDS:
+    for rid, label, photo_id, obs_id, user, _size, _digest, _ext in SAMPLE_RECORDS:
         if rid not in files:
             raise ValueError(f"corpus is missing {rid}")
         image = Image.open(io.BytesIO(files[rid]))

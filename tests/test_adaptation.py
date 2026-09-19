@@ -113,6 +113,7 @@ def _pin(monkeypatch, n_per_species=4):
                     f"user{(s * n_per_species + j) % 7}",
                     len(data),
                     hashlib.sha256(data).hexdigest(),
+                    "jpg" if j % 2 else "jpeg",
                 )
             )
     monkeypatch.setattr(sm, "SAMPLE_RECORDS", tuple(table))
@@ -124,7 +125,10 @@ def _pin(monkeypatch, n_per_species=4):
 
 def test_pinned_record_table_is_complete_and_traceable():
     assert len(SAMPLE_RECORDS) == 180 and len(SPECIES) == 6
-    assert all(len(r) == 7 and len(r[6]) == 64 and r[5] > 10_000 and r[1] in SPECIES for r in SAMPLE_RECORDS)
+    assert all(len(r) == 8 and len(r[6]) == 64 and r[5] > 10_000 and r[1] in SPECIES for r in SAMPLE_RECORDS)
+    exts = {r[7] for r in SAMPLE_RECORDS}
+    assert exts == {"jpg", "jpeg"}  # the bucket serves both; a single hard-coded extension 404s on 87 photos
+    assert sum(r[7] == "jpeg" for r in SAMPLE_RECORDS) == 87
     assert len({r[0] for r in SAMPLE_RECORDS}) == 180 and len({r[2] for r in SAMPLE_RECORDS}) == 180
     counts = {}
     for r in SAMPLE_RECORDS:
@@ -136,9 +140,12 @@ def test_pinned_record_table_is_complete_and_traceable():
     assert all(
         len(set(u)) == len(u) for u in per_species_users.values()
     )  # one photo per observer per species
-    assert sm.photo_url(SAMPLE_RECORDS[0][2]).startswith(
+    assert sm.photo_url(SAMPLE_RECORDS[0][2], SAMPLE_RECORDS[0][7]).startswith(
         "https://inaturalist-open-data.s3.amazonaws.com/photos/"
     )
+    assert sm.photo_url(1, "jpeg").endswith("/1/medium.jpeg") and sm.photo_url(1).endswith("/1/medium.jpg")
+    with pytest.raises(ValueError, match="extension"):
+        sm.photo_url(1, "png")
     assert sum(r[5] for r in SAMPLE_RECORDS) == sm.CORPUS_BYTES
     assert sum(SAMPLE_SPLIT.values()) == 30 and set(SAMPLE_SPLIT) == {"train", "validation", "test"}
 
@@ -147,7 +154,11 @@ def test_fetch_corpus_verifies_each_file_and_caches(tmp_path, monkeypatch, forbi
     files = _pin(monkeypatch)
     calls = []
 
+    expected_ext = {r[2]: r[7] for r in sm.SAMPLE_RECORDS}
+
     def fetcher(url):
+        photo_id, name = url.rsplit("/", 2)[1:]
+        assert name == f"medium.{expected_ext[int(photo_id)]}", url
         calls.append(url)
         return files[int(url.rsplit("/", 2)[1])]
 
