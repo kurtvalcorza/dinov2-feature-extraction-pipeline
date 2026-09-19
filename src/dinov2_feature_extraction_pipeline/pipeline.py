@@ -373,9 +373,10 @@ class DINOv2FeatureExtractionPipeline:
 
         head, classes = self._require_head()
         result = self.embed(images)
+        head_device = next(head.parameters()).device  # the head lives on the model device while it trains
         with torch.inference_mode():
-            logits = head(torch.tensor(result["embeddings"], dtype=torch.float32))
-            probabilities = torch.softmax(logits, dim=-1)
+            logits = head(torch.tensor(result["embeddings"], dtype=torch.float32, device=head_device))
+            probabilities = torch.softmax(logits, dim=-1).cpu()
         return {
             "labels": [classes[int(i)] for i in probabilities.argmax(dim=-1)],
             "probabilities": [[float(v) for v in row] for row in probabilities.tolist()],

@@ -141,3 +141,23 @@ def test_adapt_is_transactional_when_the_progress_callback_raises(pipe):
     after = pipe._model.state_dict()
     assert all(torch.equal(before[k], after[k]) for k in before) and pipe.adapter is None
     assert pipe._head is None and not any(p.requires_grad for p in pipe._model.parameters())
+
+
+@pytest.mark.skipif(not torch.cuda.is_available(), reason="CUDA device required")
+def test_unfreeze_with_validation_scores_on_a_cuda_device(tmp_path):
+    """Regression: validation during the unfrozen stage calls `classify` while the head lives on the model
+    device; the CPU-side features must be moved to it (the Kaggle T4 run failed here with mat1 on cpu)."""
+    gpu = DINOv2FeatureExtractionPipeline.from_pretrained(device="cuda:0")
+    result = gpu.adapt(RECORDS[:9], RECORDS[9:], probe_steps=20, trainable_blocks=1, epochs=1, batch_size=4)
+    assert result["history"][-1]["val"] is not None and result["history"][-1]["val"]["n"] == 3
+    metrics = gpu.evaluate(RECORDS[9:])
+    assert metrics["n"] == 3 and metrics["adapted"] is True
+    labels = gpu.classify([r["image"] for r in RECORDS[:3]])
+    assert len(labels["probabilities"]) == 3
+    assert all(abs(sum(row) - 1) < 1e-4 for row in labels["probabilities"])
+    artifact = gpu.save_artifact(tmp_path / "adapter", {"note": "cuda"})
+    reloaded = DINOv2FeatureExtractionPipeline.from_artifact(artifact, device="cpu")
+    cpu_probabilities = reloaded.classify([r["image"] for r in RECORDS[:3]])["probabilities"]
+    for row_a, row_b in zip(labels["probabilities"], cpu_probabilities, strict=True):
+        assert all(abs(a - b) < 1e-3 for a, b in zip(row_a, row_b, strict=True))
+
