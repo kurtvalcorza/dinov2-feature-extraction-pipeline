@@ -42,7 +42,7 @@ The task is image feature extraction: input one PIL image or a batch of up to `M
 
 ###### Primary Intended Users
 
-The intended users are machine-learning engineers, data scientists and application developers building retrieval, clustering or few-shot classification systems in research prototypes, internal enterprise tooling, or the DIMER model workbench. The pipeline assumes its users understand that an embedding carries no label and no score, that cosine similarity between two vectors is meaningful only relative to a threshold they calibrate on their own data, that the vector encodes whatever the self-supervised objective found salient (including background, style and layout, not only the subject), and that any downstream use needs its own labelled evaluation. It is not designed for hobbyist "point and trust" use.
+The intended users are machine-learning engineers, data scientists and application developers building retrieval, clustering or few-shot classification systems in research prototypes or in-house tooling. The pipeline assumes its users understand that an embedding carries no label and no score, that cosine similarity between two vectors is meaningful only relative to a threshold they calibrate on their own data, that the vector encodes whatever the self-supervised objective found salient (including background, style and layout, not only the subject), and that any downstream use needs its own labelled evaluation. It is not designed for hobbyist "point and trust" use.
 
 ###### Out-of-scope use cases
 
