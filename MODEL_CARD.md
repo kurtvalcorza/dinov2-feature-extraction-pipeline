@@ -99,7 +99,7 @@ Misuse as a biometric: general image embeddings can be repurposed for person re-
 
 ###### Use cases
 
-The pipeline must not be used for surveillance, biometric identification, person re-identification, demographic profiling, or social scoring; its vectors are not designed or evaluated for any of these, and adapting them to try is a misuse. It must not support unlawful discrimination in employment, housing, credit, insurance, education or healthcare access, nor deceptive or manipulative applications such as fabricating evidence that two images depict the same thing. Any use that violates the license terms of the upstream weights (Apache-2.0 per the snapshot README; see the `cc-by-nc-4.0` discrepancy noted under Data) or the DIMER deployment terms is prohibited. The developers identify no further prohibited use beyond these.
+The pipeline must not be used for surveillance, biometric identification, person re-identification, demographic profiling, or social scoring; its vectors are not designed or evaluated for any of these, and adapting them to try is a misuse. It must not support unlawful discrimination in employment, housing, credit, insurance, education or healthcare access, nor deceptive or manipulative applications such as fabricating evidence that two images depict the same thing. Any use that violates the license terms of the upstream weights (Apache-2.0 per the snapshot README; see the `cc-by-nc-4.0` discrepancy noted under Data) or the terms of the deployment that runs the pipeline is prohibited. The developers identify no further prohibited use beyond these.
 
 ## Immutable provenance
 
