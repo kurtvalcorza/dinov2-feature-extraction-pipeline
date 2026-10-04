@@ -2116,9 +2116,24 @@ def split_dataset(
     return splits
 
 
+def validate_splits(splits: Mapping[str, Sequence[Mapping[str, Any]]]) -> dict[str, dict[str, Any]]:
+    """Validate each split against the contract and name the split in any refusal. The training split needs
+    MIN_RECORDS..MAX_RECORDS records; the validation and test splits need at least one record (the minimum
+    that `adapt` and `evaluate` apply), and every split needs MIN_CLASSES..MAX_CLASSES labels."""
+    manifests = {}
+    for name, part in splits.items():
+        minimum = MIN_RECORDS if name == "train" else 1
+        try:
+            manifests[name] = validate_dataset(part, min_records=minimum)
+        except ValueError as exc:
+            raise ValueError(f"{name} split: {exc}") from None
+    return manifests
+
+
 def load_byod_dataset(path: str | Path) -> list[dict[str, Any]]:
     """Read `{id, image, label}` records from a directory or a zip holding `labels.csv` (columns `id`, `file`,
-    `label`) beside the image files; images are decoded, never extracted to disk."""
+    `label`) beside the image files; images are decoded, never extracted to disk. A row whose file is missing
+    or is not a decodable image raises ValueError naming the labels.csv line, the id and the file."""
     source = Path(path)
     if source.is_dir():
         table = (source / "labels.csv").read_text(encoding="utf-8")
@@ -2137,9 +2152,17 @@ def load_byod_dataset(path: str | Path) -> list[dict[str, Any]]:
     if missing:
         raise ValueError(f"labels.csv is missing columns {sorted(missing)}")
     out = []
-    for row in rows:
-        image = loader(row["file"])
-        image.load()
+    for number, row in enumerate(rows, start=2):  # line 1 of labels.csv is the header
+        where = f"labels.csv line {number} (id {row.get('id')!r}, file {row.get('file')!r})"
+        try:
+            image = loader(row["file"])
+            image.load()
+        except (KeyError, FileNotFoundError, IsADirectoryError):
+            raise ValueError(f"{where}: the file is not in the dataset; add it or remove the row") from None
+        except (OSError, Image.DecompressionBombError) as exc:  # UnidentifiedImageError is an OSError
+            raise ValueError(
+                f"{where}: not a decodable image ({type(exc).__name__}); use a PNG, JPEG, WebP or BMP file"
+            ) from None
         out.append({"id": row["id"], "image": image.convert("RGB"), "label": row["label"]})
     return out
 

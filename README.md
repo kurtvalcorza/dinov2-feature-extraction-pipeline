@@ -35,7 +35,7 @@ pipe.save_artifact("outputs/dinov2_adapter")                      # adapter.safe
 reloaded = DINOv2FeatureExtractionPipeline.from_artifact("outputs/dinov2_adapter")
 ```
 
-There is no label, no score and no metric helper: an embedding has no intrinsic accuracy. Evaluate on your own downstream task (retrieval, clustering, a linear probe) and calibrate any similarity threshold on your own labelled pairs.
+`embed` itself returns no label and no score: an embedding has no intrinsic accuracy (the labelled `classify` / `evaluate` path above and `classification_metrics` measure a trained head, not the embedding). Evaluate on your own downstream task (retrieval, clustering, a linear probe) and calibrate any similarity threshold on your own labelled pairs.
 
 ## Weights layout
 
@@ -75,7 +75,7 @@ print(len(vec), sum(v * v for v in vec))   # 384 1.0
 
 ## Release status
 
-**Release-grade** — the `E2E` notebook blob `fa03142c` (committed at `f7f0d3b`) executed top-to-bottom in a clean Kaggle Tesla T4 runtime on 2026-09-19 (11/11 ok (1 restart after install cell), 293.8 s); the record is in `docs/release-verification.md` and `STATUS.md`. Static and unit checks — including the standalone generator parity checks — are necessary but were never the evidence; the hosted run is. A later change to the carried modules or the notebook returns the status to Candidate until re-verified.
+**Candidate** — the `E2E` notebook was revised after its review (uv isolated environment, pretrained-base reset before every adaptation, guided layer) and no hosted run of the new blob is recorded yet. The earlier Kaggle Tesla T4 run of blob `fa03142c` (committed at `f7f0d3b`, 2026-09-19, 293.8 s) passed only after a manual restart after the install cell: not a one-pass Run all, not promotion evidence. The record is in `docs/release-verification.md` and `STATUS.md`. Static and unit checks — including the standalone generator parity checks — are necessary but were never the evidence; the hosted run is. A later change to the carried modules or the notebook returns the status to Candidate until re-verified.
 
 ## Documents
 

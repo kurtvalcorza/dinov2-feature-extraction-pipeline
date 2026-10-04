@@ -46,6 +46,7 @@ from .samples import (
     observer_overlap,
     split_dataset,
     validate_dataset,
+    validate_splits,
     write_dataset_csv,
 )
 
@@ -91,6 +92,7 @@ __all__ = [
     "split_dataset",
     "stage_missing_files",
     "validate_dataset",
+    "validate_splits",
     "validate_inputs",
     "verify_snapshot",
     "write_dataset_csv",
