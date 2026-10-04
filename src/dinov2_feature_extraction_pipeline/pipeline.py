@@ -241,6 +241,9 @@ class DINOv2FeatureExtractionPipeline:
     adapter: dict[str, Any] | None = field(default=None, repr=False)
     _head: Any = field(default=None, repr=False)
     _model: Any = field(default=None, repr=False)
+    # Pretrained values of every base tensor adapt() or load_artifact() has overwritten (copy-on-write), so
+    # the verified base can be restored without reloading the snapshot (DV2-M2).
+    _pretrained: dict[str, Any] = field(default_factory=dict, repr=False)
 
     @classmethod
     def from_pretrained(
@@ -330,6 +333,42 @@ class DINOv2FeatureExtractionPipeline:
                 "this operation needs a pipeline built with from_pretrained() or from_artifact()"
             )
         return self._model
+
+    def _keep_pretrained(self, names: Sequence[str]) -> None:
+        """Copy the pretrained values of `names` the first time they are about to be overwritten."""
+        if not names:
+            return
+        state = self._require_model().state_dict()
+        for name in names:
+            if name not in self._pretrained:
+                self._pretrained[name] = state[name].detach().clone()
+
+    def _restore_pretrained(self) -> None:
+        """Put back every base tensor an earlier adapt() or load_artifact() changed; refreeze the base."""
+        if self._model is None or not self._pretrained:
+            return
+        model = self._model
+        merged = dict(model.state_dict())
+        merged.update(self._pretrained)
+        model.load_state_dict(merged, strict=True)
+        model.eval()
+        for param in model.parameters():
+            param.requires_grad_(False)
+
+    def reset_to_pretrained(self) -> DINOv2FeatureExtractionPipeline:
+        """Return to the verified pretrained base: restore any adapted transformer blocks and drop the head,
+        classes and adapter, so `embed`, `features` and `knn_baseline` describe DINOv2 itself again."""
+        self._restore_pretrained()
+        self._head, self.classes, self.adapter = None, None, None
+        return self
+
+    @property
+    def backbone_adapted(self) -> bool:
+        """True when some base tensor currently differs from the pretrained value kept for it."""
+        if self._model is None or not self._pretrained:
+            return False
+        state = self._model.state_dict()
+        return any(not bool((state[k] == v).all()) for k, v in self._pretrained.items())
 
     def _require_head(self) -> tuple[Any, list[str]]:
         if self._head is None or not self.classes:
@@ -454,7 +493,11 @@ class DINOv2FeatureExtractionPipeline:
         clipping 1.0, seeded shuffling, no augmentation; the patch embedding, the position embedding, the
         earlier blocks and the final norm stay frozen), scored on validation after every epoch. The epoch with
         the lowest validation log-loss (mean negative log-probability of the gold label) is kept — it may be
-        the probe itself; accuracy and macro-F1 are reported beside it at every epoch."""
+        the probe itself; accuracy and macro-F1 are reported beside it at every epoch.
+
+        Every call starts from the **pretrained base**: block weights left by an earlier `adapt` or
+        `load_artifact` on this pipeline are restored first, so reruns with other settings are comparable and
+        the exported artifact (head plus the blocks this call trained) reproduces the in-memory model."""
         from .samples import class_names, validate_dataset
 
         if not isinstance(probe_steps, int) or not 1 <= probe_steps <= 5_000:
@@ -475,8 +518,10 @@ class DINOv2FeatureExtractionPipeline:
         classes = class_names(train_checked)
         import torch
 
-        torch.manual_seed(seed)
         model = self._require_model()
+        self._restore_pretrained()
+        self._keep_pretrained(names)
+        torch.manual_seed(seed)
         started = time.perf_counter()
         device = torch.device(self.device)
         index = {c: i for i, c in enumerate(classes)}
@@ -733,7 +778,8 @@ class DINOv2FeatureExtractionPipeline:
 
     def load_artifact(self, artifact_dir: str | Path) -> dict[str, Any]:
         """Verify an adapter's manifest, digest and exact tensor set **before** deserialising, rebuild
-        the head and overlay its block tensors (none under the frozen policy)."""
+        the head and overlay its block tensors (none under the frozen policy) onto the pretrained base
+        (blocks left by an earlier `adapt` or `load_artifact` are restored first)."""
         root = Path(artifact_dir)
         manifest = json.loads((root / ARTIFACT_MANIFEST_NAME).read_text(encoding="utf-8"))
         weights_path, classes, blocks = self._check_artifact_manifest(root, manifest)
@@ -774,6 +820,9 @@ class DINOv2FeatureExtractionPipeline:
         head.eval()
         for p in head.parameters():
             p.requires_grad_(False)
+        self._restore_pretrained()
+        self._keep_pretrained(sorted(block_tensors))
+        state = model.state_dict()
         if block_tensors:
             merged = dict(state)
             merged.update({k: v.to(state[k].dtype) for k, v in block_tensors.items()})
