@@ -153,7 +153,10 @@ probe_val_log_loss = probe_result['history'][0]['val']['log_loss'] if probe_resu
 print({'frozen_policy': probe_result['policy'], 'probe_final_loss': round(probe_result['probe_final_loss'], 4), 'validation': {k: round(v, 4) for k, v in probe_result['history'][0]['val'].items()}, 'seconds': round(time.perf_counter() - t0, 1)})
 print({'frozen_policy_test': brief(frozen_test), 'log_loss': round(frozen_test['log_loss'], 4), 'verdict': frozen_test['verdict'], 'per_class_recall': {c: round(v['recall'], 2) for c, v in frozen_test['per_class'].items()}})
 print({'definitions': frozen_test['definitions']})
-assert frozen_test['accuracy'] > floor['accuracy'] and probe_result['policy'].startswith('frozen')"""
+assert probe_result['policy'].startswith('frozen'), probe_result['policy']  # contract: trainable_blocks=0 is the frozen policy
+# A recorded verdict, not an assert: a BYOD split where the probe does not beat the floor still reaches the export.
+frozen_verdict = 'above the majority floor' if frozen_test['accuracy'] > floor['accuracy'] else 'not above the majority floor'
+print({'frozen_vs_majority_floor': frozen_verdict, 'frozen_accuracy': round(frozen_test['accuracy'], 4), 'floor_accuracy': round(floor['accuracy'], 4)})"""
 )
 
 _UNFROZEN_CODE = _py(
@@ -194,6 +197,11 @@ comparison['log_loss'] = {'frozen_policy': round(frozen_test['log_loss'], 4), 's
 comparison['per_class_recall'] = {c: {'knn5': round(baseline_knn['per_class'][c]['recall'], 2), 'frozen': round(frozen_test['per_class'][c]['recall'], 2), 'selected': round(adapted_test['per_class'][c]['recall'], 2)} for c in classes}
 comparison['delta_vs_frozen'] = {metric: round(adapted_test[metric] - frozen_test[metric], 4) for metric in ('accuracy', 'macro_f1')}
 comparison['selected_policy'] = adapt_result['policy']
+# Recorded verdicts, not asserts: a BYOD run that stays at or below the floor still exports, reloads and writes result.json.
+selected_verdict = 'above the majority floor' if adapted_test['accuracy'] > floor['accuracy'] else 'not above the majority floor'
+delta_accuracy = adapted_test['accuracy'] - frozen_test['accuracy']
+adaptation_verdict = 'improved' if delta_accuracy > 0 else ('no gain' if delta_accuracy == 0 else 'worse')
+comparison['verdicts'] = {'frozen_vs_majority_floor': frozen_verdict, 'selected_vs_majority_floor': selected_verdict, 'selected_vs_frozen_test_accuracy': adaptation_verdict}
 for metric, row in comparison.items():
     print({metric: row})
 print({'confusion_selected': adapted_test['confusion'], 'classes': classes})
@@ -215,7 +223,6 @@ evaluation_report_payload = {
 }
 with open('outputs/@STEM@_evaluation_report.json', 'w', encoding='utf-8') as f:
     json.dump(evaluation_report_payload, f, indent=2, ensure_ascii=False)
-assert adapted_test['accuracy'] > floor['accuracy']
 print({'report': 'outputs/@STEM@_evaluation_report.json'})
 
 # One row per Section 7 run in this session, so a changed setting is read next to the default run.
@@ -558,8 +565,10 @@ TEMPLATE = {
                 "training or validation splits. The selected model is scored exactly as the frozen policy was in Section 6, "
                 "and the four rows are put side by side: majority floor, k-NN vote, frozen policy, selected policy. Read "
                 "the policy first: if validation kept the probe, the last two rows are the same model; if it chose the "
-                "unfreeze, the delta is what the unfreeze bought on 48 photographs. The cell asserts the selected model "
-                "beats the majority floor; it does **not** assert a gain over the probe, because that is the question, not "
+                "unfreeze, the delta is what the unfreeze bought on 48 photographs. The cell records a verdict — whether the "
+                "selected model is above the majority floor, and `improved` / `no gain` / `worse` against the probe's test "
+                "accuracy — instead of stopping, so a BYOD run that does not beat the floor still exports and reloads; "
+                "the verdicts go into the evaluation report and `result.json`. A gain over the probe is the question, not "
                 "the answer. 48 photographs from one seeded split of one corpus give no dispersion estimate — one image "
                 "is about two points of accuracy. The cell also adds this run to `run_history`, which Section 10 prints.\n\n"
                 "**Predict before running:** validation preferred the unfreeze. Will its test accuracy be higher than the "
