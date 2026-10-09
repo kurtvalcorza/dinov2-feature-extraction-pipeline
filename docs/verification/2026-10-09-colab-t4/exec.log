@@ -1,0 +1,70 @@
+[colab] Parsing notebook '/home/kurt/colab-runs/dinov2-feature-extraction-pipeline-a4cecc7-3cb9dd/dinov2_feature_extraction_colab_a4cecc7_colab-cli-t4.ipynb'...
+[colab] Executing cell 1/14 - Infrastructure: install the locked runtime into an isolated environment...
+{'isolated_environment': '/content/dimer_isolated_env', 'isolated_python': '3.12.12', 'kernel_python': '3.13.15', 'locked_packages': 45, 'setup_seconds': 56}
+[colab] Executing cell 2/14 - Infrastructure: route the remaining cells to the isolated environment...
+Every later code cell now runs in /content/dimer_isolated_env/bin/python (pid 1745).
+[colab] Executing cell 3/14 - Infrastructure: record the runtime...
+{'notebook_source': {'repository': 'dinov2-feature-extraction-pipeline', 'repository_revision': 'aa1f7b1b31a75742c5550d13e3d1fb4c6937389e', 'embedded_module': 'src/dinov2_feature_extraction_pipeline/pipeline.py', 'embedded_modules': ['src/dinov2_feature_extraction_pipeline/metrics.py', 'src/dinov2_feature_extraction_pipeline/pipeline.py', 'src/dinov2_feature_extraction_pipeline/samples.py'], 'module_sha256': 'fd06177208e5d0d0b16b0dfbef0671d84e9d13bff5d83098b434d9f49b05bf28', 'generator': 'build_notebook.py/2.1', 'notebook_spec': '2.2'}, 'python': '3.12.12', 'torch': '2.14.0+cu130', 'timm': '1.0.29', 'cuda': True}
+[colab] Executing cell 4/14 - Infrastructure: carried module `src/dinov2_feature_extraction_pipeline/metrics.py` (you may run it without reading it)...
+[colab] Executing cell 5/14 - Infrastructure: carried module `src/dinov2_feature_extraction_pipeline/pipeline.py` (you may run it without reading it)...
+[colab] Executing cell 6/14 - Infrastructure: carried module `src/dinov2_feature_extraction_pipeline/samples.py` (you may run it without reading it)...
+[colab] Executing cell 7/14 - Infrastructure: pin, stage and verify the model (you may run it without reading it)...
+{'model_id': 'timm/vit_small_patch14_dinov2.lvd142m', 'revision': '4610ca143709d58a633b6397a74412c2c3842454', 'license': 'apache-2.0', 'files': 3, 'total_bytes': 88245132}
+{'weights_dir': '/content/weights/vit-small-dinov2', 'fetched': ['README.md', 'config.json', 'model.safetensors']}
+{'verified_files': 3, 'revision': '4610ca143709d58a633b6397a74412c2c3842454'}
+{'device': 'cuda:0', 'source': 'local-snapshot'}
+[colab] Executing cell 8/14 - dinov2_feature_extraction-17...
+{'data_source': "iNaturalist CC0 bird photographs (six species) (iNaturalist open-data bucket, research-grade CC0 photos selected 2026-09-19; CC0 1.0 (each photo's own license_code on iNaturalist; observers credited in the records))", 'raw': {'photographs': 180, 'species': 6}, 'splits': {'train': 108, 'validation': 24, 'test': 48}, 'classes': ['american_goldfinch', 'chipping_sparrow', 'dark_eyed_junco', 'house_finch', 'song_sparrow', 'white_throated_sparrow'], 'observer_overlap': {'observers': 117, 'in_more_than_one_split': 31}, 'fetch_seconds': 72.0, 'corpus_bytes': 19183071}
+{'train': {'n': 108, 'label_counts': {'american_goldfinch': 18, 'chipping_sparrow': 18, 'dark_eyed_junco': 18, 'house_finch': 18, 'song_sparrow': 18, 'white_throated_sparrow': 18}, 'image_side': {'min': 342, 'max': 500}, 'digest': '1e4cca7f06bb7139...'}}
+{'validation': {'n': 24, 'label_counts': {'american_goldfinch': 4, 'chipping_sparrow': 4, 'dark_eyed_junco': 4, 'house_finch': 4, 'song_sparrow': 4, 'white_throated_sparrow': 4}, 'image_side': {'min': 484, 'max': 500}, 'digest': 'd176b3ffe79c959f...'}}
+{'test': {'n': 48, 'label_counts': {'american_goldfinch': 8, 'chipping_sparrow': 8, 'dark_eyed_junco': 8, 'house_finch': 8, 'song_sparrow': 8, 'white_throated_sparrow': 8}, 'image_side': {'min': 500, 'max': 500}, 'digest': '0e787f098949f60a...'}}
+{'example': {'id': 'train-000', 'label': 'white_throated_sparrow', 'observer': 'ethologist', 'inat_observation_url': 'https://www.inaturalist.org/observations/194541980'}, 'size': (375, 500)}
+{'probe': 'duplicate id', 'rejected': "duplicate id 'same'"}
+{'probe': 'oversized image', 'rejected': 'records[0]: image side outside 1..MAX_IMAGE_SIDE=4096 px: (4097, 8)'}
+{'probe': 'single class', 'rejected': '1 distinct labels; 2..100 are required'}
+{'probe': 'too small', 'rejected': '3 records; 8..20000 are required'}
+[colab] Executing cell 9/14 - dinov2_feature_extraction-19...
+{'ceilings': {'MAX_IMAGE_SIDE': 4096, 'MAX_BATCH': 32}, 'contract': {'EMBED_DIM': 384, 'POOLING': 'cls', 'NORMALIZED': True, 'TRANSFORMER_BLOCKS': 12, 'PARAMETER_COUNT': 22056192}}
+{'probe_ids': ['test-000', 'test-001', 'test-002'], 'probe_labels': ['chipping_sparrow', 'american_goldfinch', 'song_sparrow'], 'seconds': 0.593, 'device': 'cuda:0', 'backbone': 'pretrained', 'checks': {'one_vector_per_image': True, 'unit_norm': True, 'contract_fields': True, 'all_values_finite': True}, 'findings': 1}
+{'cosine_same_species': 0.385, 'cosine_other_species': 0.2197, 'note': 'one pair each; a similarity, not a score'}
+[colab] Executing cell 10/14 - dinov2_feature_extraction-21...
+{'majority_floor': {'accuracy': 0.1667, 'macro_f1': 0.0476, 'n': 48}, 'baseline': "majority training label ('american_goldfinch') predicted for every image"}
+{'knn_baseline': {'accuracy': 0.8333, 'macro_f1': 0.8308, 'n': 48}, 'baseline': 'cosine 5-NN vote over the frozen features of the training images', 'seconds': 7.4}
+{'frozen_policy': 'frozen backbone + linear probe', 'probe_final_loss': 0.0209, 'validation': {'n': 24, 'accuracy': 1.0, 'macro_f1': 1.0, 'log_loss': 0.0732}, 'seconds': 9.2}
+{'frozen_policy_test': {'accuracy': 0.8333, 'macro_f1': 0.8361, 'n': 48}, 'log_loss': 0.4984, 'verdict': 'measured-small-sample', 'per_class_recall': {'american_goldfinch': 0.88, 'chipping_sparrow': 1.0, 'dark_eyed_junco': 0.75, 'house_finch': 0.88, 'song_sparrow': 0.62, 'white_throated_sparrow': 0.88}}
+{'definitions': {'accuracy': 'fraction of images whose predicted label equals the gold label', 'macro_f1': 'unweighted mean over classes of the per-class F1 (precision-recall harmonic mean)', 'per_class': 'precision, recall, F1 and support for every class of the gold label set', 'confusion': 'rows are gold classes, columns predicted classes, in the order of `classes`', 'log_loss': 'mean negative log-probability the head assigns to the gold label (the selection signal)'}}
+{'frozen_vs_majority_floor': 'above the majority floor', 'frozen_accuracy': 0.8333, 'floor_accuracy': 0.1667}
+[colab] Executing cell 11/14 - dinov2_feature_extraction-23...
+{'epoch': 0, 'stage': 'linear probe (frozen backbone)', 'train_loss': 0.0209, 'val_log_loss': 0.0732, 'val_accuracy': 1.0, 'val_macro_f1': 1.0}
+{'epoch': 1, 'stage': 'unfrozen last 2 blocks', 'train_loss': 0.0451, 'val_log_loss': 0.098, 'val_accuracy': 0.9583, 'val_macro_f1': 0.9577}
+{'epoch': 2, 'stage': 'unfrozen last 2 blocks', 'train_loss': 0.0061, 'val_log_loss': 0.0919, 'val_accuracy': 0.9583, 'val_macro_f1': 0.9577}
+{'epoch': 3, 'stage': 'unfrozen last 2 blocks', 'train_loss': 0.0012, 'val_log_loss': 0.022, 'val_accuracy': 1.0, 'val_macro_f1': 1.0}
+{'epoch': 4, 'stage': 'unfrozen last 2 blocks', 'train_loss': 0.0003, 'val_log_loss': 0.0413, 'val_accuracy': 1.0, 'val_macro_f1': 1.0}
+{'starts_from_pretrained_base': {'epoch0_val_log_loss': 0.073175, 'section6_probe_val_log_loss': 0.073175, 'abs_difference': 0.0}}
+{'selected_policy': 'unfrozen last 2 blocks + linear head', 'best_epoch': 3, 'selection': 'lowest validation log-loss (epoch 0 = linear probe)', 'trainable_head': 2310, 'trainable_blocks': 3550464, 'total_parameters': 22056192, 'seconds': 33.3}
+[colab] Executing cell 12/14 - dinov2_feature_extraction-25...
+{'accuracy': {'majority_floor': 0.1667, 'knn5': 0.8333, 'frozen_policy': 0.8333, 'selected_policy': 0.8333}}
+{'macro_f1': {'majority_floor': 0.0476, 'knn5': 0.8308, 'frozen_policy': 0.8361, 'selected_policy': 0.8403}}
+{'log_loss': {'frozen_policy': 0.4984, 'selected_policy': 0.5688}}
+{'per_class_recall': {'american_goldfinch': {'knn5': 1.0, 'frozen': 0.88, 'selected': 0.88}, 'chipping_sparrow': {'knn5': 0.75, 'frozen': 1.0, 'selected': 0.88}, 'dark_eyed_junco': {'knn5': 0.62, 'frozen': 0.75, 'selected': 0.75}, 'house_finch': {'knn5': 0.88, 'frozen': 0.88, 'selected': 0.88}, 'song_sparrow': {'knn5': 0.75, 'frozen': 0.62, 'selected': 0.75}, 'white_throated_sparrow': {'knn5': 1.0, 'frozen': 0.88, 'selected': 0.88}}}
+{'delta_vs_frozen': {'accuracy': 0.0, 'macro_f1': 0.0042}}
+{'selected_policy': 'unfrozen last 2 blocks + linear head'}
+{'verdicts': {'frozen_vs_majority_floor': 'above the majority floor', 'selected_vs_majority_floor': 'above the majority floor', 'selected_vs_frozen_test_accuracy': 'no gain'}}
+{'confusion_selected': [[7, 1, 0, 0, 0, 0], [0, 7, 1, 0, 0, 0], [0, 0, 6, 0, 1, 1], [0, 1, 0, 7, 0, 0], [0, 2, 0, 0, 6, 0], [0, 1, 0, 0, 0, 7]], 'classes': ['american_goldfinch', 'chipping_sparrow', 'dark_eyed_junco', 'house_finch', 'song_sparrow', 'white_throated_sparrow']}
+{'report': 'outputs/dinov2_feature_extraction_evaluation_report.json'}
+[colab] Executing cell 13/14 - dinov2_feature_extraction-27...
+{'id': 'test-000', 'gold': 'chipping_sparrow', 'frozen_label': 'chipping_sparrow', 'frozen_top_probability': 0.9828, 'selected_label': 'chipping_sparrow', 'selected_top_probability': 0.9983}
+{'id': 'test-001', 'gold': 'american_goldfinch', 'frozen_label': 'american_goldfinch', 'frozen_top_probability': 0.9959, 'selected_label': 'american_goldfinch', 'selected_top_probability': 0.9998}
+{'id': 'test-002', 'gold': 'song_sparrow', 'frozen_label': 'white_throated_sparrow', 'frozen_top_probability': 0.4916, 'selected_label': 'song_sparrow', 'selected_top_probability': 0.5346}
+{'id': 'test-003', 'gold': 'white_throated_sparrow', 'frozen_label': 'white_throated_sparrow', 'frozen_top_probability': 0.8881, 'selected_label': 'white_throated_sparrow', 'selected_top_probability': 0.9989}
+{'id': 'test-004', 'gold': 'dark_eyed_junco', 'frozen_label': 'dark_eyed_junco', 'frozen_top_probability': 0.4755, 'selected_label': 'dark_eyed_junco', 'selected_top_probability': 0.6127}
+{'id': 'test-005', 'gold': 'chipping_sparrow', 'frozen_label': 'chipping_sparrow', 'frozen_top_probability': 0.7281, 'selected_label': 'chipping_sparrow', 'selected_top_probability': 0.9926}
+{'batch_report_verdict': 'not-measurable', 'selected_policy': 'unfrozen last 2 blocks + linear head', 'predictions_changed': 1, 'of': 6}
+{'artifact': 'outputs/dinov2_feature_extraction_adapter', 'format': 'org.valcorza.vit-small-dinov2.adapter.v1', 'policy': 'unfrozen last 2 blocks + linear head', 'classes': ['american_goldfinch', 'chipping_sparrow', 'dark_eyed_junco', 'house_finch', 'song_sparrow', 'white_throated_sparrow'], 'tensors': 30, 'bytes': 14213808, 'sha256': '6683ec0ad0ab8485...'}
+{'reload_parity': {'probabilities_identical': True, 'accuracy_in_memory': 0.833333, 'accuracy_reloaded': 0.833333, 'classes_identical': True}, 'reloaded_policy': 'unfrozen last 2 blocks + linear head', 'reloaded_best_epoch': 3}
+['dinov2_feature_extraction_adapter', 'dinov2_feature_extraction_evaluation_report.json', 'dinov2_feature_extraction_input_manifest.json', 'dinov2_feature_extraction_predictions.csv', 'dinov2_feature_extraction_result.json', 'dinov2_feature_extraction_train.csv']
+[colab] Executing cell 14/14 - dinov2_feature_extraction-29...
+run | trainable_blocks | learning_rate | epochs | data | probe_val_log_loss | best_epoch | selected_policy | test_accuracy | test_macro_f1 | frozen_test_accuracy
+1 | 2 | 3e-05 | 4 | sample | 0.0732 | 3 | unfrozen last 2 blocks + linear head | 0.8333 | 0.8403 | 0.8333
+One run so far. Set TRAINABLE_BLOCKS = 1 in Section 7, select that cell and choose Runtime > Run after; this table then shows both runs.
+[colab] Saving notebook with outputs to '/home/kurt/colab-runs/dinov2-feature-extraction-pipeline-a4cecc7-3cb9dd/dinov2_feature_extraction_colab_a4cecc7_colab-cli-t4_output.ipynb'...

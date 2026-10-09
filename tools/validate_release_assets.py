@@ -62,7 +62,8 @@ CODE_MARKERS = (
     "baseline_knn = pipe.knn_baseline(train_records, test_records, k=5)",
     "probe_result = pipe.adapt(train_records, val_records, probe_steps=PROBE_STEPS, probe_lr=PROBE_LR, trainable_blocks=0)",
     "frozen_test = pipe.evaluate(test_records)",
-    "assert frozen_test['accuracy'] > floor['accuracy'] and probe_result['policy'].startswith('frozen')",
+    "assert probe_result['policy'].startswith('frozen')",
+    "frozen_verdict = 'above the majority floor' if frozen_test['accuracy'] > floor['accuracy'] else",
     # Stage 7: the unfrozen policy with explicit hyperparameters
     "adapt_result = pipe.adapt(",
     "trainable_blocks=TRAINABLE_BLOCKS",
@@ -72,7 +73,7 @@ CODE_MARKERS = (
     "adapted_test = pipe.evaluate(test_records)",
     "adapted_val = pipe.evaluate(val_records)",
     "'delta_vs_frozen'",
-    "assert adapted_test['accuracy'] > floor['accuracy']",
+    "comparison['verdicts'] = {'frozen_vs_majority_floor': frozen_verdict, 'selected_vs_majority_floor': selected_verdict",
     # Stage 9: predictions before/after, batch report, artifact, reload parity, provenance
     "after = pipe.classify([r['image'] for r in show])",
     "single_report = evaluation_report(",
@@ -104,7 +105,12 @@ STALE_MARKDOWN = (
     "Restart the runtime, then rerun",
     "installs the pinned dependencies",
 )
-STALE_CODE = ("frozen_pipe = DINOv2FeatureExtractionPipeline.from_pretrained(",)
+STALE_CODE = (
+    "frozen_pipe = DINOv2FeatureExtractionPipeline.from_pretrained(",
+    # Fleet sweep SWP-A: quality asserts that aborted a BYOD run before the export; they are recorded verdicts now.
+    "assert frozen_test['accuracy'] > floor['accuracy']",
+    "assert adapted_test['accuracy'] > floor['accuracy']",
+)
 # The guided layer (NOTEBOOK_SPEC 2.2 §3.5, GDL1-GDL15; review DV2-M3): each marker with its minimum count.
 GUIDED_MARKERS = (
     ("**Who this is for.**", 1),
