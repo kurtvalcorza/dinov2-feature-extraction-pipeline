@@ -75,7 +75,7 @@ print(len(vec), sum(v * v for v in vec))   # 384 1.0
 
 ## Release status
 
-**Candidate** — the `E2E` notebook was revised after its review (uv isolated environment, pretrained-base reset before every adaptation, guided layer) and no hosted run of the new blob is recorded yet. The earlier Kaggle Tesla T4 run of blob `fa03142c` (committed at `f7f0d3b`, 2026-09-19, 293.8 s) passed only after a manual restart after the install cell: not a one-pass Run all, not promotion evidence. The record is in `docs/release-verification.md` and `STATUS.md`. Static and unit checks — including the standalone generator parity checks — are necessary but were never the evidence; the hosted run is. A later change to the carried modules or the notebook returns the status to Candidate until re-verified.
+**Candidate** — the `E2E` notebook was revised after its review (uv isolated environment, pretrained-base reset before every adaptation, guided layer). The current blob `c2333f2a` (`a4cecc7`) passed a one-pass Colab CLI sequential execution on a fresh Tesla T4 on 2026-10-09 (14/14 code cells, no restart, 0 errors, default settings only); BYOD and the activity rerun are not yet exercised. The earlier Kaggle Tesla T4 run of blob `fa03142c` (committed at `f7f0d3b`, 2026-09-19, 293.8 s) passed only after a manual restart after the install cell: not a one-pass Run all, not promotion evidence. The record is in `docs/release-verification.md` and `STATUS.md`. Static and unit checks — including the standalone generator parity checks — are necessary but were never the evidence; the hosted run is. A later change to the carried modules or the notebook returns the status to Candidate until re-verified.
 
 ## Documents
 
