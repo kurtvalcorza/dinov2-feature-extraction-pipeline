@@ -172,6 +172,8 @@ runtime, not general estimates.
 
 ## Current status
 
+**Tier C wording revision (2026-10-25, branch `fix/dinov2-feature-extraction-tier-c-2026-10-25`, code commit `81ffc8e`).** Markdown, header and metadata only: pretraining-overlap statement (DAT9), run-labelled numbers (REL13), the held-out split wording, use notice, `notebook_kind`, IEEE references and the DIMER Notebook Specification 2.5 declaration. The regenerated notebook blob `b75f29cfb1cc93b8126cc83d8180e096bb099dc0` is **Candidate** and its hosted runs are **pending** (REL14); the 2026-10-09 Colab T4 run of `a4cecc7` is evidence for blob `c2333f2a` only.
+
 **Candidate.** The notebook was revised after the Notebook Review Framework v1 review (PR #9: DV2-M1..M3,
 DV2-m1..m4): a uv isolated environment replaces the in-kernel install, every adaptation starts from the
 pretrained base, BYOD splits are validated with the minimums the pipeline applies, and the guided layer is added.
