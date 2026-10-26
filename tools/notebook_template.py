@@ -35,29 +35,95 @@ _DATA_CODE = _py(
     """import hashlib
 import io
 import json
+import shutil
 import time
+import zipfile
 
 USE_BYOD = False  # @param {type:"boolean"}
 BYOD_PATH = ''  # @param {type:"string"}
 SPLIT_SEED = 42  # @param {type:"integer"}
 
+class BYODRefusal(ValueError):
+    \"\"\"A refused BYOD input: ``BYODRefusal(file_name, reason_and_fix)``.\"\"\"
+
+    dimer_refusal = True
+
+    def __init__(self, file_name, reason):
+        super().__init__(f"{file_name}: {reason}")
+        self.file_name = file_name
+        self.reason = reason
+
+    def _render_traceback_(self):
+        return [f"Refused: {self}"]
+
+
+# What an earlier run of Sections 4-10 left in this session. A refused input removes these results and the
+# outputs/ files below (DAT20), so nothing from that run can pass as a result of the refused file.
+RUN_RESULT_NAMES = (
+    't0', 'byod_path', 'file_name', 'uploaded', 'payload', 'records', 'splits', 'data_source', 'raw_count', 'corpus',
+    'fetch_seconds', 'train_records', 'val_records', 'test_records', 'dataset_manifests', 'classes', 'disjoint',
+    'overlap', 'manifest', 'example', 'probes', 'probe', 'probe_records', 'input_manifest', 'started',
+    'embedding_result', 'embed_seconds', 'vectors', 'checks', 'partners', 'same', 'other', 'cosines', 'partner',
+    'partner_vector', 'floor', 'baseline_knn', 'probe_result', 'frozen_test', 'show', 'frozen_before',
+    'probe_val_log_loss', 'frozen_verdict', 'adapt_result', 'adapt_seconds', 'epoch0', 'start_check', 'adapted_test',
+    'adapted_val', 'comparison', 'selected_verdict', 'delta_accuracy', 'adaptation_verdict', 'metric', 'row',
+    'evaluation_report_payload', 'run_history', 'after', 'rows', 'i', 'record', 'single_report', 'writer',
+    'artifact_dir', 'artifact_manifest', 'reloaded', 'reloaded_after', 'reloaded_test', 'parity', 'weight_entry',
+    'result_payload', 'columns',
+)
+RUN_OUTPUTS = (
+    'outputs/@STEM@_*',
+)
+
+
+def refuse_byod(file_name, reason):
+    \"\"\"Remove the earlier run's results and outputs/ files, then stop the cell with one Refused: line naming the file and the fix.\"\"\"
+    for name in RUN_RESULT_NAMES:
+        globals().pop(name, None)
+    for pattern in RUN_OUTPUTS:
+        for path in Path('.').glob(pattern):
+            if path.is_dir():
+                shutil.rmtree(path, ignore_errors=True)
+            else:
+                path.unlink()
+    reason = str(reason).rstrip('. ')
+    if 'again' not in reason:
+        reason += '; fix the input, then run this cell and every cell after it again'
+    raise BYODRefusal(file_name, reason + ' (the earlier results of this session and their outputs/ files were removed).') from None
+
+
 os.makedirs('outputs', exist_ok=True)
 t0 = time.perf_counter()
 if USE_BYOD:
-    if BYOD_PATH:
-        byod_path = Path(BYOD_PATH)
-        file_name = byod_path.name
-    else:
-        from google.colab import files
-        uploaded = files.upload()
-        if len(uploaded) != 1:
-            raise ValueError(f'Upload exactly one .zip holding labels.csv and the images (got {len(uploaded)}). Outside Colab, set BYOD_PATH to a .zip or a directory instead.')
-        file_name, payload = next(iter(uploaded.items()))
-        byod_path = Path('work') / file_name
-        byod_path.parent.mkdir(parents=True, exist_ok=True)
-        byod_path.write_bytes(payload)
-    records = load_byod_dataset(byod_path)
-    splits = split_dataset(records, seed=SPLIT_SEED)
+    # DAT20: every problem with your zip or folder (path, upload, labels.csv, images, split) stops here as one Refused: line.
+    # The pinned iNaturalist sample keeps its traceback: a failure there is not your input.
+    file_name = (Path(BYOD_PATH).name or BYOD_PATH) if BYOD_PATH else '(no file)'
+    try:
+        if BYOD_PATH:
+            byod_path = Path(BYOD_PATH)
+            file_name = byod_path.name or BYOD_PATH
+            if not byod_path.exists():
+                raise BYODRefusal(file_name, f'BYOD_PATH {BYOD_PATH!r} does not exist in this runtime: set it to a .zip or a directory holding labels.csv and the images, and run this cell again')
+            if byod_path.is_dir() and not (byod_path / 'labels.csv').is_file():
+                raise BYODRefusal(file_name, 'the folder holds no labels.csv: put labels.csv (columns id, file, label) beside the images, or set BYOD_PATH to a .zip of them, and run this cell again')
+        else:
+            try:
+                from google.colab import files
+            except ImportError:
+                raise BYODRefusal('(no file)', 'USE_BYOD opens the Colab upload dialog, and this runtime is not Colab: set BYOD_PATH to a .zip or a directory and run this cell again') from None
+            uploaded = files.upload()
+            if len(uploaded) != 1:
+                raise BYODRefusal(', '.join(sorted(uploaded)) or '(no file)', f'Upload exactly one .zip holding labels.csv and the images (got {len(uploaded)}). Outside Colab, set BYOD_PATH to a .zip or a directory instead; run this cell again.')
+            file_name, payload = next(iter(uploaded.items()))
+            byod_path = Path('work') / file_name
+            byod_path.parent.mkdir(parents=True, exist_ok=True)
+            byod_path.write_bytes(payload)
+        records = load_byod_dataset(byod_path)
+        splits = split_dataset(records, seed=SPLIT_SEED)
+    except BYODRefusal as exc:
+        refuse_byod(exc.file_name, exc.reason)
+    except (TypeError, ValueError, KeyError, OSError, zipfile.BadZipFile) as exc:
+        refuse_byod(file_name, f'{type(exc).__name__}: {exc}')
     data_source = 'BYOD (' + file_name + ')'
     raw_count = {'byod': len(records)}
 else:
@@ -68,7 +134,12 @@ else:
 fetch_seconds = round(time.perf_counter() - t0, 1)
 train_records, val_records, test_records = splits['train'], splits['validation'], splits['test']
 # Training split: 8..20,000 records; validation and test: at least 1 (what adapt and evaluate accept). A refusal names the split.
-dataset_manifests = validate_splits(splits)
+try:
+    dataset_manifests = validate_splits(splits)
+except (TypeError, ValueError) as exc:
+    if not USE_BYOD:
+        raise
+    refuse_byod(file_name, f'{type(exc).__name__}: {exc}')
 classes = class_names(train_records)
 disjoint = check_split_disjoint(splits)
 overlap = observer_overlap(splits)
