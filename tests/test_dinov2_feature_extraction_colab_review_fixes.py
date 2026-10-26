@@ -397,4 +397,4 @@ def test_guided_layer_and_infrastructure_cells(nb: dict) -> None:
         assert md.count(marker) >= least, marker
     titled = [c for c in _code_cells(nb) if _src(c).startswith("# @title Infrastructure:")]
     assert len(titled) == 7 and all(c["metadata"].get("cellView") == "form" for c in titled)
-    assert nb["metadata"]["dimer"]["notebook_spec"] == "2.2"
+    assert nb["metadata"]["dimer"]["notebook_spec"] == "2.5"
