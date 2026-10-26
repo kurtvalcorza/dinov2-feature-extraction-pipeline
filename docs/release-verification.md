@@ -186,3 +186,5 @@ earlier blob `c2333f2a` (`a4cecc7`) passed the same Colab CLI sequential executi
 `f7f0d3b`) passed only after a manual restart after the install cell, so it is not a one-pass Run all and not
 promotion evidence; the earlier rows remain history. Promotion still needs the REL12 BYOD exercise and the active-learning rerun of step 6, plus
 any remaining steps of the procedure above (for example a Kaggle run of the current blob).
+
+The current blob `13e2a822` (code commit `df289e3`) shows a refused BYOD input as one `Refused: <file>: <reason>` line with no traceback, removes the earlier run's results and `outputs/` files and stops Run all at that cell, while genuine failures keep their traceback (NOTEBOOK_SPEC DAT19/DAT20); its hosted Colab T4 runs (the default path and a scripted refusal, `USE_BYOD=True;BYOD_PATH='/content/sample_data'`) are pending, and the hosted runs of earlier blobs, including `b75f29cfb1cc`, are history for it (REL14).
