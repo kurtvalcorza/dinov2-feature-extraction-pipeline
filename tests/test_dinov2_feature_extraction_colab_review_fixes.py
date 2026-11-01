@@ -90,7 +90,7 @@ def test_exactly_two_kernel_cells_and_a_hash_locked_isolated_install(nb: dict) -
         assert needed in install
     assert "_ip.input_transformers_cleanup.append(_route_to_isolated_runtime)" in kernel[1]
     lock = (ROOT / "tutorials" / "requirements-colab.lock.txt").read_text(encoding="utf-8")
-    for pin in ("torch==2.14.0", "timm==1.0.29", "numpy==2.5.3", "pillow==11.3.0", "safetensors==0.8.0"):
+    for pin in ("torch==2.14.0", "timm==1.0.29", "numpy==2.5.3", "pillow==13.0.0", "safetensors==0.8.0"):
         assert pin in lock
 
 
